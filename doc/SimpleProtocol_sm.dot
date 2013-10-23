@@ -1,0 +1,188 @@
+digraph SimpleProtocol {
+
+    node
+        [shape=Mrecord width=1.5];
+
+    subgraph cluster_Simple {
+
+        label="Simple";
+
+        //
+        // States (Nodes)
+        //
+
+        "Simple::Initial"
+            [label="{Initial}"];
+
+        "Simple::ProtocolError"
+            [label="{ProtocolError}"];
+
+        "%start"
+            [label="" shape=circle style=filled fillcolor=black width=0.25];
+
+        //
+        // Transitions (Edges)
+        //
+
+        "Simple::Initial" -> "Simple::ProtocolError"
+            [label="accepted/\l"];
+
+        "Simple::Initial" -> "Simple::ProtocolError"
+            [label="connected/\l"];
+
+        "Simple::Initial" -> "Simple::ProtocolError"
+            [label="closing/\l"];
+
+        "Simple::Initial" -> "Simple::ProtocolError"
+            [label="readError/\l"];
+
+        "Simple::Initial" -> "Simple::ProtocolError"
+            [label="writeError/\l"];
+
+        "Simple::Initial" -> "Simple::ProtocolError"
+            [label="readReady/\l"];
+
+        "Simple::Initial" -> "Simple::ProtocolError"
+            [label="writeReady/\l"];
+
+        "Simple::ProtocolError" -> "Simple::ProtocolError"
+            [label="closing/\l"];
+
+        "Simple::ProtocolError" -> "Simple::ProtocolError"
+            [label="readError/\l"];
+
+        "Simple::ProtocolError" -> "Simple::ProtocolError"
+            [label="writeError/\l"];
+
+        "Simple::ProtocolError" -> "Simple::ProtocolError"
+            [label="readReady/\l"];
+
+        "Simple::ProtocolError" -> "Simple::ProtocolError"
+            [label="writeReady/\l"];
+
+        "%start" -> "Simple::Initial"
+    }
+
+    subgraph cluster_SimpleClient {
+
+        label="SimpleClient";
+
+        //
+        // States (Nodes)
+        //
+
+        "SimpleClient::Connect"
+            [label="{Connect}"];
+
+        "SimpleClient::ProtocolError"
+            [label="{ProtocolError}"];
+
+        //
+        // Transitions (Edges)
+        //
+
+        "SimpleClient::Connect" -> "SimpleClient::ProtocolError"
+            [label="accepted/\l"];
+
+        "SimpleClient::Connect" -> "SimpleClient::ProtocolError"
+            [label="closing/\l"];
+
+        "SimpleClient::Connect" -> "SimpleClient::ProtocolError"
+            [label="connected/\l"];
+
+        "SimpleClient::Connect" -> "SimpleClient::ProtocolError"
+            [label="readError/\l"];
+
+        "SimpleClient::Connect" -> "SimpleClient::ProtocolError"
+            [label="writeError/\l"];
+
+        "SimpleClient::Connect" -> "SimpleClient::ProtocolError"
+            [label="readReady/\l"];
+
+        "SimpleClient::Connect" -> "SimpleClient::ProtocolError"
+            [label="writeReady/\l"];
+
+        "SimpleClient::ProtocolError" -> "SimpleClient::ProtocolError"
+            [label="accepted/\l"];
+
+        "SimpleClient::ProtocolError" -> "SimpleClient::ProtocolError"
+            [label="closing/\l"];
+
+        "SimpleClient::ProtocolError" -> "SimpleClient::ProtocolError"
+            [label="connected/\l"];
+
+        "SimpleClient::ProtocolError" -> "SimpleClient::ProtocolError"
+            [label="readError/\l"];
+
+        "SimpleClient::ProtocolError" -> "SimpleClient::ProtocolError"
+            [label="writeError/\l"];
+
+        "SimpleClient::ProtocolError" -> "SimpleClient::ProtocolError"
+            [label="readReady/\l"];
+
+        "SimpleClient::ProtocolError" -> "SimpleClient::ProtocolError"
+            [label="writeReady/\l"];
+    }
+
+    subgraph cluster_SimpleServer {
+
+        label="SimpleServer";
+
+        //
+        // States (Nodes)
+        //
+
+        "SimpleServer::Accept"
+            [label="{Accept}"];
+
+        "SimpleServer::ProtocolError"
+            [label="{ProtocolError}"];
+
+        //
+        // Transitions (Edges)
+        //
+
+        "SimpleServer::Accept" -> "SimpleServer::ProtocolError"
+            [label="accepted/\l"];
+
+        "SimpleServer::Accept" -> "SimpleServer::ProtocolError"
+            [label="closing/\l"];
+
+        "SimpleServer::Accept" -> "SimpleServer::ProtocolError"
+            [label="connected/\l"];
+
+        "SimpleServer::Accept" -> "SimpleServer::ProtocolError"
+            [label="readError/\l"];
+
+        "SimpleServer::Accept" -> "SimpleServer::ProtocolError"
+            [label="writeError/\l"];
+
+        "SimpleServer::Accept" -> "SimpleServer::ProtocolError"
+            [label="readReady/\l"];
+
+        "SimpleServer::Accept" -> "SimpleServer::ProtocolError"
+            [label="writeReady/\l"];
+
+        "SimpleServer::ProtocolError" -> "SimpleServer::ProtocolError"
+            [label="accepted/\l"];
+
+        "SimpleServer::ProtocolError" -> "SimpleServer::ProtocolError"
+            [label="closing/\l"];
+
+        "SimpleServer::ProtocolError" -> "SimpleServer::ProtocolError"
+            [label="connected/\l"];
+
+        "SimpleServer::ProtocolError" -> "SimpleServer::ProtocolError"
+            [label="readError/\l"];
+
+        "SimpleServer::ProtocolError" -> "SimpleServer::ProtocolError"
+            [label="writeError/\l"];
+
+        "SimpleServer::ProtocolError" -> "SimpleServer::ProtocolError"
+            [label="readReady/\l"];
+
+        "SimpleServer::ProtocolError" -> "SimpleServer::ProtocolError"
+            [label="writeReady/\l"];
+    }
+
+}
