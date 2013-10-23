@@ -70,4 +70,9 @@ public class SimpleProtocolImpl implements SimpleProtocol {
         fsm.writeReady(writeBuffer);
     }
 
+    @Override
+    public void send(String msg) {
+        // TODO Auto-generated method stub
+
+    }
 }

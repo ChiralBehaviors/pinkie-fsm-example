@@ -10,10 +10,10 @@ import com.hellblazer.pinkie.buffer.BufferProtocolHandler;
  */
 public interface SimpleProtocol extends BufferProtocolHandler {
     public enum MessageType {
-        ESTABLISH,
-        HELLO,
-        GOOD_BYE;
+        ESTABLISH, MSG, ACK, GOOD_BYE;
     }
 
     void setBufferProtocol(BufferProtocol bufferProtocol);
+
+    void send(String msg);
 }
