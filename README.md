@@ -1,4 +1,5 @@
 pinkie-fsm-example
 ==================
 
-A simple binary protocol implementation using Pinkie and a FSM
+A simple binary protocol implementation using Pinkie and an FSM
+

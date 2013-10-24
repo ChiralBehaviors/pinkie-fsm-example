@@ -25,9 +25,23 @@
 		<repository>
 			<id>hellblazer-snapshots</id>
 			<name>Hellblazer Snapshots </name>
-			<url>http://repository-ouroboros.forge.cloudbees.com/snapshot/</url>
+			<url>http://repository-hal900000.forge.cloudbees.com/snapshot/</url>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
 		</repository>
 	</repositories>
+
+	<pluginRepositories>
+		<pluginRepository>
+			<id>hellblazer-snapshots-plugin</id>
+			<name>Hellblazer Snapshots </name>
+			<url>http://repository-hal900000.forge.cloudbees.com/snapshot/</url>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+		</pluginRepository>
+	</pluginRepositories>
 
 	<build>
 		<plugins>
@@ -83,6 +97,13 @@
 						</configuration>
 					</execution>
 				</executions>
+				<dependencies>
+					<dependency>
+						<groupId>com.salesforce.smc</groupId>
+						<artifactId>smc-runtime</artifactId>
+						<version>6.1.0-SNAPSHOT</version>
+					</dependency>
+				</dependencies>
 			</plugin>
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
