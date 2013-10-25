@@ -140,6 +140,9 @@ digraph SimpleProtocol {
         "SimpleClient::SessionEstablished"
             [label="{SessionEstablished}"];
 
+        "SimpleClient::SendMessage"
+            [label="{SendMessage}"];
+
         "SimpleClient::pop(readError)"
             [label="" width=1]
 
@@ -183,6 +186,12 @@ digraph SimpleProtocol {
         "SimpleClient::Connect" -> "SimpleClient::pop(protocolError)"
             [label="writeReady/\l"];
 
+        "SimpleClient::SessionEstablished" -> "SimpleClient::SendMessage"
+            [label="ackReceived/\l"];
+
+        "SimpleClient::SessionEstablished" -> "SimpleClient::pop(protocolError)"
+            [label="protocolError/\l"];
+
         "SimpleClient::SessionEstablished" -> "SimpleClient::pop(protocolError)"
             [label="accepted/\l"];
 
@@ -202,6 +211,27 @@ digraph SimpleProtocol {
             [label="readReady/\l"];
 
         "SimpleClient::SessionEstablished" -> "SimpleClient::pop(protocolError)"
+            [label="writeReady/\l"];
+
+        "SimpleClient::SendMessage" -> "SimpleClient::pop(protocolError)"
+            [label="accepted/\l"];
+
+        "SimpleClient::SendMessage" -> "SimpleClient::pop(closing)"
+            [label="closing/\l"];
+
+        "SimpleClient::SendMessage" -> "SimpleClient::pop(protocolError)"
+            [label="connected/\l"];
+
+        "SimpleClient::SendMessage" -> "SimpleClient::pop(readError)"
+            [label="readError/\l"];
+
+        "SimpleClient::SendMessage" -> "SimpleClient::pop(writeError)"
+            [label="writeError/\l"];
+
+        "SimpleClient::SendMessage" -> "SimpleClient::pop(protocolError)"
+            [label="readReady/\l"];
+
+        "SimpleClient::SendMessage" -> "SimpleClient::pop(protocolError)"
             [label="writeReady/\l"];
 
         "SimpleClient::pop(readError)" -> "SimpleClient::%end"

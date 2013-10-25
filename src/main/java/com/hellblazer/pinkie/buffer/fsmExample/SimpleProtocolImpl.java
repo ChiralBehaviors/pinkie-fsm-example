@@ -19,6 +19,7 @@ import java.nio.ByteBuffer;
 
 import com.hellblazer.pinkie.buffer.BufferProtocol;
 import com.hellblazer.pinkie.buffer.BufferProtocolHandler;
+import com.hellblazer.pinkie.buffer.fsmExample.SimpleProtocolContext.SimpleProtocolState;
 
 /**
  * 
@@ -59,8 +60,8 @@ public class SimpleProtocolImpl implements SimpleProtocol {
         }
 
         @Override
-        public void readReady(ByteBuffer readBuffer) {
-            fsm.readReady(readBuffer);
+        public void readReady() {
+            fsm.readReady();
         }
 
         @Override
@@ -69,14 +70,14 @@ public class SimpleProtocolImpl implements SimpleProtocol {
         }
 
         @Override
-        public void writeReady(ByteBuffer writeBuffer) {
-            fsm.writeReady(writeBuffer);
+        public void writeReady() {
+            fsm.writeReady();
         }
     }
 
     private final BufferProtocolHandlerImpl handler;
     private final SimpleProtocolContext     fsm;
-    @SuppressWarnings("unused")
+
     private BufferProtocol                  bufferProtocol;
 
     public SimpleProtocolImpl() {
@@ -101,13 +102,34 @@ public class SimpleProtocolImpl implements SimpleProtocol {
 
     @Override
     public void establishSession() {
-        // TODO Auto-generated method stub
-
+        ByteBuffer buffer = bufferProtocol.getWriteBuffer();
+        buffer.put((byte) MessageType.ESTABLISH.ordinal());
+        buffer.flip();
+        ByteBuffer readBuffer = bufferProtocol.getReadBuffer();
+        readBuffer.limit(1);
+        readBuffer.rewind();
+        bufferProtocol.selectForWrite();
+        //waiting for stuff to read...
+        bufferProtocol.selectForRead();
     }
 
     @Override
-    public void ackReceived(ByteBuffer readBuffer) {
-        // TODO Auto-generated method stub
+    public void ackReceived() {
+    	ByteBuffer readBuffer = bufferProtocol.getReadBuffer();
+    	readBuffer.rewind();
+        if (readBuffer.get() == (byte)MessageType.ACK.ordinal()) {
+        	fsm.ackReceived();
+        } else {
+        	fsm.protocolError();
+        }
 
     }
+
+	/**
+	 * @return
+	 */
+	public SimpleProtocolState getCurrentState() {
+		return fsm.getState();
+	}
+
 }

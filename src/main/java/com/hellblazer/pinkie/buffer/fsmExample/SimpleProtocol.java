@@ -15,8 +15,6 @@
  */
 package com.hellblazer.pinkie.buffer.fsmExample;
 
-import java.nio.ByteBuffer;
-
 import com.hellblazer.pinkie.buffer.BufferProtocol;
 
 /**
@@ -35,5 +33,6 @@ public interface SimpleProtocol {
     
     void establishSession();
     
-    void ackReceived(ByteBuffer readBuffer);
+    void ackReceived();
+
 }

@@ -8,10 +8,10 @@
 %%
 Initial {
     accepted(bufferProtocol: BufferProtocol)
-        Connected/push(SimpleClient::Connect) {}
+        Connected/push(SimpleClient::Connect) {setBufferProtocol(bufferProtocol);}
         
     connected(bufferProtocol: BufferProtocol) 
-        Connected/push(SimpleServer::Accept) {}
+        Connected/push(SimpleServer::Accept) {setBufferProtocol(bufferProtocol);}
 }
 
 Connected {
@@ -42,10 +42,10 @@ Default {
     writeError()
         Closed {}
         
-    readReady(readBuffer: ByteBuffer)
+    readReady()
         ProtocolError {}
         
-    writeReady(writeBuffer: ByteBuffer)
+    writeReady()
         ProtocolError {}
 }
 %%
@@ -58,11 +58,20 @@ Entry {
     establishSession();
 }
 {
-    readReady(readBuffer: ByteBuffer)
-        SessionEstablished {ackReceived(readBuffer);}
+    readReady
+        SessionEstablished {}
 }
 
-SessionEstablished {
+SessionEstablished
+Entry {
+	ackReceived();
+}	
+ {
+    ackReceived     SendMessage{}
+    protocolError   pop(protocolError){}
+}
+
+SendMessage {
 }
 
 Default {
@@ -81,10 +90,10 @@ Default {
     writeError()
         pop(writeError) {}
         
-    readReady(readBuffer: ByteBuffer)
+    readReady()
         pop(protocolError) {}
         
-    writeReady(writeBuffer: ByteBuffer)
+    writeReady()
         pop(protocolError) {}
 }
 %%
@@ -114,10 +123,10 @@ Default {
     writeError()
         pop(writeError) {}
         
-    readReady(readBuffer: ByteBuffer)
+    readReady()
         pop(protocolError) {}
         
-    writeReady(writeBuffer: ByteBuffer)
+    writeReady()
         pop(protocolError) {}
 }
 %%

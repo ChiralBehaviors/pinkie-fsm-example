@@ -47,16 +47,12 @@
         </th>
         <th>
           readReady
-          <br>
-          (ByteBuffer)
         </th>
         <th>
           writeError
         </th>
         <th>
           writeReady
-          <br>
-          (ByteBuffer)
         </th>
         <th>
           <b>Default</b>
@@ -73,7 +69,9 @@
         <td>
           <pre>
   Connected/push(Simple::Initial)
-  {}
+  {
+    setBufferProtocol(bufferProtocol);
+  }
           </pre>
         </td>
         <td>
@@ -81,7 +79,9 @@
         <td>
           <pre>
   Connected/push(Simple::Initial)
-  {}
+  {
+    setBufferProtocol(bufferProtocol);
+  }
           </pre>
         </td>
         <td>
@@ -207,7 +207,7 @@
         <th colspan=2>
           Actions
         </th>
-        <th colspan=8>
+        <th colspan=10>
           Transition
         </th>
       </tr>
@@ -224,6 +224,9 @@
           (BufferProtocol)
         </th>
         <th>
+          ackReceived
+        </th>
+        <th>
           closing
         </th>
         <th>
@@ -232,20 +235,19 @@
           (BufferProtocol)
         </th>
         <th>
+          protocolError
+        </th>
+        <th>
           readError
         </th>
         <th>
           readReady
-          <br>
-          (ByteBuffer)
         </th>
         <th>
           writeError
         </th>
         <th>
           writeReady
-          <br>
-          (ByteBuffer)
         </th>
         <th>
           <b>Default</b>
@@ -257,8 +259,12 @@
         </td>
         <td>
           <pre>
-establishSession();
+    establishSession();
           </pre>
+        </td>
+        <td>
+        </td>
+        <td>
         </td>
         <td>
         </td>
@@ -273,9 +279,7 @@ establishSession();
         <td>
           <pre>
   SessionEstablished
-  {
-    ackReceived(readBuffer);
-  }
+  {}
           </pre>
         </td>
         <td>
@@ -288,6 +292,50 @@ establishSession();
       <tr>
         <td>
           SessionEstablished
+        </td>
+        <td>
+          <pre>
+    ackReceived();
+          </pre>
+        </td>
+        <td>
+        </td>
+        <td>
+        </td>
+        <td>
+          <pre>
+  SendMessage
+  {}
+          </pre>
+        </td>
+        <td>
+        </td>
+        <td>
+        </td>
+        <td>
+          <pre>
+  pop(protocolError)
+  {}
+          </pre>
+        </td>
+        <td>
+        </td>
+        <td>
+        </td>
+        <td>
+        </td>
+        <td>
+        </td>
+        <td>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          SendMessage
+        </td>
+        <td>
+        </td>
+        <td>
         </td>
         <td>
         </td>
@@ -352,16 +400,12 @@ establishSession();
         </th>
         <th>
           readReady
-          <br>
-          (ByteBuffer)
         </th>
         <th>
           writeError
         </th>
         <th>
           writeReady
-          <br>
-          (ByteBuffer)
         </th>
         <th>
           <b>Default</b>
