@@ -8,14 +8,24 @@
 %%
 Initial {
     accepted(bufferProtocol: BufferProtocol)
-        ProtocolError {
-            setBufferProtocol(bufferProtocol);
-        }
+        Connected/push(SimpleClient::Connect) {}
         
-    connected(bufferProtocol: BufferProtocol)
-        ProtocolError {
-            setBufferProtocol(bufferProtocol);
-        }
+    connected(bufferProtocol: BufferProtocol) 
+        Connected/push(SimpleServer::Accept) {}
+}
+
+Connected {
+    protocolError
+        ProtocolError {}
+    closing
+        Closed {}
+    readError
+        Closed {}
+    writeError
+        Closed {}
+}
+
+Closed {
 }
 
 ProtocolError {
@@ -27,53 +37,55 @@ Default {
         ProtocolError {}
         
     readError()
-        ProtocolError {}
+        Closed {}
         
     writeError()
-        ProtocolError {}
+        Closed {}
         
     readReady(readBuffer: ByteBuffer)
         ProtocolError {}
         
     writeReady(writeBuffer: ByteBuffer)
         ProtocolError {}
-        
-    
 }
 %%
 
 %map SimpleClient
 %%
 
-Connect {
+Connect 
+Entry {
+    establishSession();
+}
+{
+    readReady(readBuffer: ByteBuffer)
+        SessionEstablished {ackReceived(readBuffer)}
 }
 
-ProtocolError {
+SessionEstablished {
 }
 
 Default {
     accepted(bufferProtocol: BufferProtocol)
-        ProtocolError {}
+        pop(protocolError)
      
     closing()
-        ProtocolError {}
+        pop(closing)
         
     connected(bufferProtocol: BufferProtocol)
-        ProtocolError {}
+        pop(protocolError)
         
     readError()
-        ProtocolError {}
+        pop(readError)
         
     writeError()
-        ProtocolError {}
+        pop(writeError)
         
     readReady(readBuffer: ByteBuffer)
-        ProtocolError {}
+        pop(protocolError)
         
     writeReady(writeBuffer: ByteBuffer)
-        ProtocolError {}
-        
-    
+        pop(protocolError)
 }
 %%
 
@@ -88,26 +100,24 @@ ProtocolError {
 
 Default {
     accepted(bufferProtocol: BufferProtocol)
-        ProtocolError {}
+        pop(protocolError)
      
     closing()
-        ProtocolError {}
+        pop(closing)
         
     connected(bufferProtocol: BufferProtocol)
-        ProtocolError {}
+        pop(protocolError)
         
     readError()
-        ProtocolError {}
+        pop(readError)
         
     writeError()
-        ProtocolError {}
+        pop(writeError)
         
     readReady(readBuffer: ByteBuffer)
-        ProtocolError {}
+        pop(protocolError)
         
     writeReady(writeBuffer: ByteBuffer)
-        ProtocolError {}
-        
-    
+        pop(protocolError)
 }
 %%

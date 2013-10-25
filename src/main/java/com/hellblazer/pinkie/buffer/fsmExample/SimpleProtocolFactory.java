@@ -15,25 +15,18 @@
  */
 package com.hellblazer.pinkie.buffer.fsmExample;
 
-import java.nio.ByteBuffer;
+import java.nio.channels.SocketChannel;
 
+import com.hellblazer.pinkie.CommunicationsHandler;
+import com.hellblazer.pinkie.CommunicationsHandlerFactory;
 import com.hellblazer.pinkie.buffer.BufferProtocol;
 
-/**
- * 
- * @author hhildebrand
- * 
- */
-public interface SimpleProtocol {
-    public enum MessageType {
-        ESTABLISH, MSG, ACK, GOOD_BYE;
+public class SimpleProtocolFactory implements CommunicationsHandlerFactory {
+
+    @Override
+    public CommunicationsHandler createCommunicationsHandler(SocketChannel channel) {
+        return new BufferProtocol(
+                                  new SimpleProtocolImpl().getBufferProtocolHandler()).getHandler();
     }
 
-    void setBufferProtocol(BufferProtocol bufferProtocol);
-
-    void send(String msg);
-    
-    void establishSession();
-    
-    void ackReceived(ByteBuffer readBuffer);
 }

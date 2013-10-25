@@ -14,21 +14,39 @@ digraph SimpleProtocol {
         "Simple::Initial"
             [label="{Initial}"];
 
+        "Simple::Connected"
+            [label="{Connected}"];
+
+        "Simple::Closed"
+            [label="{Closed}"];
+
         "Simple::ProtocolError"
             [label="{ProtocolError}"];
 
+        "Simple::Connected::SimpleClient"
+            [label="{SimpleClient|O-O\r}"]
+
+        "Simple::Connected::SimpleServer"
+            [label="{SimpleServer|O-O\r}"]
+
         "%start"
             [label="" shape=circle style=filled fillcolor=black width=0.25];
+
+        "push(SimpleServer::Accept)"
+            [label="" shape=plaintext];
+
+        "push(SimpleClient::Connect)"
+            [label="" shape=plaintext];
 
         //
         // Transitions (Edges)
         //
 
-        "Simple::Initial" -> "Simple::ProtocolError"
-            [label="accepted/\l"];
+        "Simple::Initial" -> "Simple::Connected::SimpleClient"
+            [label="accepted/\lpush(SimpleClient::Connect)\l"];
 
-        "Simple::Initial" -> "Simple::ProtocolError"
-            [label="connected/\l"];
+        "Simple::Initial" -> "Simple::Connected::SimpleServer"
+            [label="connected/\lpush(SimpleServer::Accept)\l"];
 
         "Simple::Initial" -> "Simple::ProtocolError"
             [label="closing/\l"];
@@ -45,6 +63,36 @@ digraph SimpleProtocol {
         "Simple::Initial" -> "Simple::ProtocolError"
             [label="writeReady/\l"];
 
+        "Simple::Connected" -> "Simple::ProtocolError"
+            [label="closing/\l"];
+
+        "Simple::Connected" -> "Simple::ProtocolError"
+            [label="readError/\l"];
+
+        "Simple::Connected" -> "Simple::ProtocolError"
+            [label="writeError/\l"];
+
+        "Simple::Connected" -> "Simple::ProtocolError"
+            [label="readReady/\l"];
+
+        "Simple::Connected" -> "Simple::ProtocolError"
+            [label="writeReady/\l"];
+
+        "Simple::Closed" -> "Simple::ProtocolError"
+            [label="closing/\l"];
+
+        "Simple::Closed" -> "Simple::ProtocolError"
+            [label="readError/\l"];
+
+        "Simple::Closed" -> "Simple::ProtocolError"
+            [label="writeError/\l"];
+
+        "Simple::Closed" -> "Simple::ProtocolError"
+            [label="readReady/\l"];
+
+        "Simple::Closed" -> "Simple::ProtocolError"
+            [label="writeReady/\l"];
+
         "Simple::ProtocolError" -> "Simple::ProtocolError"
             [label="closing/\l"];
 
@@ -59,8 +107,20 @@ digraph SimpleProtocol {
 
         "Simple::ProtocolError" -> "Simple::ProtocolError"
             [label="writeReady/\l"];
+
+        "Simple::Connected::SimpleClient" -> "Simple::Connected"
+            [label="pop/"]
+
+        "Simple::Connected::SimpleServer" -> "Simple::Connected"
+            [label="pop/"]
 
         "%start" -> "Simple::Initial"
+
+        "push(SimpleServer::Accept)" -> "SimpleServer::Accept"
+            [arrowtail=odot];
+
+        "push(SimpleClient::Connect)" -> "SimpleClient::Connect"
+            [arrowtail=odot];
     }
 
     subgraph cluster_SimpleClient {
@@ -77,6 +137,9 @@ digraph SimpleProtocol {
         "SimpleClient::ProtocolError"
             [label="{ProtocolError}"];
 
+        "push(SimpleClient::Connect)"
+            [label="" shape=plaintext];
+
         //
         // Transitions (Edges)
         //
@@ -122,6 +185,9 @@ digraph SimpleProtocol {
 
         "SimpleClient::ProtocolError" -> "SimpleClient::ProtocolError"
             [label="writeReady/\l"];
+
+        "push(SimpleClient::Connect)" -> "SimpleClient::Connect"
+            [arrowtail=odot];
     }
 
     subgraph cluster_SimpleServer {
@@ -138,6 +204,9 @@ digraph SimpleProtocol {
         "SimpleServer::ProtocolError"
             [label="{ProtocolError}"];
 
+        "push(SimpleServer::Accept)"
+            [label="" shape=plaintext];
+
         //
         // Transitions (Edges)
         //
@@ -183,6 +252,9 @@ digraph SimpleProtocol {
 
         "SimpleServer::ProtocolError" -> "SimpleServer::ProtocolError"
             [label="writeReady/\l"];
+
+        "push(SimpleServer::Accept)" -> "SimpleServer::Accept"
+            [arrowtail=odot];
     }
 
 }
