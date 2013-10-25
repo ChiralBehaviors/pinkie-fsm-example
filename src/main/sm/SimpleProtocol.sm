@@ -59,7 +59,7 @@ Entry {
 }
 {
     readReady(readBuffer: ByteBuffer)
-        SessionEstablished {ackReceived(readBuffer)}
+        SessionEstablished {ackReceived(readBuffer);}
 }
 
 SessionEstablished {
@@ -67,25 +67,25 @@ SessionEstablished {
 
 Default {
     accepted(bufferProtocol: BufferProtocol)
-        pop(protocolError)
+        pop(protocolError) {}
      
     closing()
-        pop(closing)
+        pop(closing) {}
         
     connected(bufferProtocol: BufferProtocol)
-        pop(protocolError)
+        pop(protocolError) {}
         
     readError()
-        pop(readError)
+        pop(readError) {}
         
     writeError()
-        pop(writeError)
+        pop(writeError) {}
         
     readReady(readBuffer: ByteBuffer)
-        pop(protocolError)
+        pop(protocolError) {}
         
     writeReady(writeBuffer: ByteBuffer)
-        pop(protocolError)
+        pop(protocolError) {}
 }
 %%
 
@@ -100,24 +100,24 @@ ProtocolError {
 
 Default {
     accepted(bufferProtocol: BufferProtocol)
-        pop(protocolError)
+        pop(protocolError) {}
      
     closing()
-        pop(closing)
+        pop(closing) {}
         
     connected(bufferProtocol: BufferProtocol)
-        pop(protocolError)
+        pop(protocolError) {}
         
     readError()
-        pop(readError)
+        pop(readError) {}
         
     writeError()
-        pop(writeError)
+        pop(writeError) {}
         
     readReady(readBuffer: ByteBuffer)
-        pop(protocolError)
+        pop(protocolError) {}
         
     writeReady(writeBuffer: ByteBuffer)
-        pop(protocolError)
+        pop(protocolError) {}
 }
 %%

@@ -15,7 +15,7 @@
         <th colspan=2>
           Actions
         </th>
-        <th colspan=8>
+        <th colspan=9>
           Transition
         </th>
       </tr>
@@ -38,6 +38,9 @@
           connected
           <br>
           (BufferProtocol)
+        </th>
+        <th>
+          protocolError
         </th>
         <th>
           readError
@@ -91,6 +94,8 @@
         </td>
         <td>
         </td>
+        <td>
+        </td>
       </tr>
       <tr>
         <td>
@@ -103,14 +108,32 @@
         <td>
         </td>
         <td>
+          <pre>
+  Closed
+  {}
+          </pre>
         </td>
         <td>
         </td>
         <td>
+          <pre>
+  ProtocolError
+  {}
+          </pre>
+        </td>
+        <td>
+          <pre>
+  Closed
+  {}
+          </pre>
         </td>
         <td>
         </td>
         <td>
+          <pre>
+  Closed
+  {}
+          </pre>
         </td>
         <td>
         </td>
@@ -141,10 +164,14 @@
         </td>
         <td>
         </td>
+        <td>
+        </td>
       </tr>
       <tr>
         <td>
           ProtocolError
+        </td>
+        <td>
         </td>
         <td>
         </td>
@@ -229,6 +256,9 @@
           Connect
         </td>
         <td>
+          <pre>
+establishSession();
+          </pre>
         </td>
         <td>
         </td>
@@ -241,6 +271,12 @@
         <td>
         </td>
         <td>
+          <pre>
+  SessionEstablished
+  {
+    ackReceived(readBuffer);
+  }
+          </pre>
         </td>
         <td>
         </td>
@@ -251,7 +287,7 @@
       </tr>
       <tr>
         <td>
-          ProtocolError
+          SessionEstablished
         </td>
         <td>
         </td>
