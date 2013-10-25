@@ -157,5 +157,21 @@ public class SimpleProtocolImpl implements SimpleProtocol {
 		
 	}
 
+	/* (non-Javadoc)
+	 * @see com.hellblazer.pinkie.buffer.fsmExample.SimpleProtocol#sendGoodbye()
+	 */
+	@Override
+	public void sendGoodbye() {
+		ByteBuffer buffer = bufferProtocol.getWriteBuffer();
+        buffer.put((byte) MessageType.GOOD_BYE.ordinal());
+        buffer.flip();
+
+        bufferProtocol.selectForWrite();
+	}
+	
+	public void close() {
+		fsm.close();
+	}
+
 
 }

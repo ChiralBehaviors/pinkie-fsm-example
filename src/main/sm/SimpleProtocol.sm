@@ -77,8 +77,12 @@ SendMessage {
     close SendGoodbye{}
 }
 
-SendGoodbye {
-
+SendGoodbye 
+Entry {
+    sendGoodbye();
+}
+{
+    closing pop(closing){}
 }
 
 AckMessage

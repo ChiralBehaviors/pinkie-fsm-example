@@ -53,5 +53,9 @@ public class TestSimpleProtocol {
 		bufferProtocol.getReadBuffer().put((byte)MessageType.ACK.ordinal());
 		handler.readReady();
 		assertEquals(SimpleProtocolContext.SimpleClient.SendMessage, protocol.getCurrentState());
+		
+		protocol.close();
+		commHandler.closing();
+		assertEquals(SimpleProtocolContext.Simple.Closed, protocol.getCurrentState());
 	}
 }

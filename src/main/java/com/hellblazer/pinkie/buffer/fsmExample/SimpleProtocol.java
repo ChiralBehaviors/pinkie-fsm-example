@@ -38,5 +38,10 @@ public interface SimpleProtocol {
 	 */
 	void sendMessage(String message);
 
+	/**
+	 * 
+	 */
+	void sendGoodbye();
+
 
 }
