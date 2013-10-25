@@ -72,6 +72,22 @@ Entry {
 }
 
 SendMessage {
+    sendMessage(message: String) nil{ sendMessage(message); }
+    readReady AckMessage {}
+    close SendGoodbye{}
+}
+
+SendGoodbye {
+
+}
+
+AckMessage
+Entry {
+    ackReceived();
+}
+{
+    ackReceived     SendMessage{}
+    protocolError pop(protocolError){}
 }
 
 Default {

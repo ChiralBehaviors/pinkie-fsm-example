@@ -207,7 +207,7 @@
         <th colspan=2>
           Actions
         </th>
-        <th colspan=10>
+        <th colspan=12>
           Transition
         </th>
       </tr>
@@ -227,6 +227,9 @@
           ackReceived
         </th>
         <th>
+          close
+        </th>
+        <th>
           closing
         </th>
         <th>
@@ -242,6 +245,11 @@
         </th>
         <th>
           readReady
+        </th>
+        <th>
+          sendMessage
+          <br>
+          (String)
         </th>
         <th>
           writeError
@@ -277,10 +285,14 @@
         <td>
         </td>
         <td>
+        </td>
+        <td>
           <pre>
   SessionEstablished
   {}
           </pre>
+        </td>
+        <td>
         </td>
         <td>
         </td>
@@ -313,10 +325,14 @@
         <td>
         </td>
         <td>
+        </td>
+        <td>
           <pre>
   pop(protocolError)
   {}
           </pre>
+        </td>
+        <td>
         </td>
         <td>
         </td>
@@ -342,8 +358,103 @@
         <td>
         </td>
         <td>
+          <pre>
+  SendGoodbye
+  {}
+          </pre>
         </td>
         <td>
+        </td>
+        <td>
+        </td>
+        <td>
+        </td>
+        <td>
+        </td>
+        <td>
+          <pre>
+  AckMessage
+  {}
+          </pre>
+        </td>
+        <td>
+          <pre>
+  SendMessage
+  {
+    sendMessage(message);
+  }
+          </pre>
+        </td>
+        <td>
+        </td>
+        <td>
+        </td>
+        <td>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          SendGoodbye
+        </td>
+        <td>
+        </td>
+        <td>
+        </td>
+        <td>
+        </td>
+        <td>
+        </td>
+        <td>
+        </td>
+        <td>
+        </td>
+        <td>
+        </td>
+        <td>
+        </td>
+        <td>
+        </td>
+        <td>
+        </td>
+        <td>
+        </td>
+        <td>
+        </td>
+        <td>
+        </td>
+        <td>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          AckMessage
+        </td>
+        <td>
+          <pre>
+    ackReceived();
+          </pre>
+        </td>
+        <td>
+        </td>
+        <td>
+        </td>
+        <td>
+          <pre>
+  SendMessage
+  {}
+          </pre>
+        </td>
+        <td>
+        </td>
+        <td>
+        </td>
+        <td>
+        </td>
+        <td>
+          <pre>
+  pop(protocolError)
+  {}
+          </pre>
         </td>
         <td>
         </td>

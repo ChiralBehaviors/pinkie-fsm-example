@@ -28,11 +28,15 @@ public interface SimpleProtocol {
     }
 
     void setBufferProtocol(BufferProtocol bufferProtocol);
-
-    void send(String msg);
     
     void establishSession();
     
     void ackReceived();
+
+	/**
+	 * @param message
+	 */
+	void sendMessage(String message);
+
 
 }
