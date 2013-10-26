@@ -114,64 +114,62 @@ public class SimpleProtocolImpl implements SimpleProtocol {
 
     @Override
     public void ackReceived() {
-    	ByteBuffer readBuffer = bufferProtocol.getReadBuffer();
-    	readBuffer.rewind();
+        ByteBuffer readBuffer = bufferProtocol.getReadBuffer();
+        readBuffer.rewind();
         byte type = readBuffer.get();
         readBuffer.limit(0);
         readBuffer.rewind();
-		if (type == (byte)MessageType.ACK.ordinal()) {
-        	fsm.ackReceived();
+        if (type == (byte) MessageType.ACK.ordinal()) {
+            fsm.ackReceived();
         } else {
-        	fsm.protocolError();
+            fsm.protocolError();
         }
 
     }
 
-	/**
-	 * @return
-	 */
-	public SimpleProtocolState getCurrentState() {
-		return fsm.getState();
-	}
+    /**
+     * @return
+     */
+    public SimpleProtocolState getCurrentState() {
+        return fsm.getState();
+    }
 
-	/* (non-Javadoc)
-	 * @see com.hellblazer.pinkie.buffer.fsmExample.SimpleProtocol#sendMessage(com.hellblazer.pinkie.buffer.fsmExample.Message)
-	 */
-	@Override
-	public void sendMessage(String message) {
-		ByteBuffer buffer = bufferProtocol.getWriteBuffer();
-		buffer.rewind();
-		buffer.limit(message.length() + 2);
-		buffer.put((byte)MessageType.MSG.ordinal());
-		bufferProtocol.setReadFullBuffer(false);
-		buffer.put((byte)message.length());
-		buffer.put(message.getBytes());
-		buffer.flip();
-		bufferProtocol.selectForWrite();
-		
-		//clear the buffer of all the old crap
-		ByteBuffer readBuffer = bufferProtocol.getReadBuffer();
-		readBuffer.limit(258);
-		bufferProtocol.selectForRead();
-		
-		
-	}
+    /* (non-Javadoc)
+     * @see com.hellblazer.pinkie.buffer.fsmExample.SimpleProtocol#sendMessage(com.hellblazer.pinkie.buffer.fsmExample.Message)
+     */
+    @Override
+    public void sendMessage(String message) {
+        ByteBuffer buffer = bufferProtocol.getWriteBuffer();
+        buffer.rewind();
+        buffer.limit(message.length() + 2);
+        buffer.put((byte) MessageType.MSG.ordinal());
+        bufferProtocol.setReadFullBuffer(false);
+        buffer.put((byte) message.length());
+        buffer.put(message.getBytes());
+        buffer.flip();
+        bufferProtocol.selectForWrite();
 
-	/* (non-Javadoc)
-	 * @see com.hellblazer.pinkie.buffer.fsmExample.SimpleProtocol#sendGoodbye()
-	 */
-	@Override
-	public void sendGoodbye() {
-		ByteBuffer buffer = bufferProtocol.getWriteBuffer();
+        //clear the buffer of all the old crap
+        ByteBuffer readBuffer = bufferProtocol.getReadBuffer();
+        readBuffer.limit(258);
+        bufferProtocol.selectForRead();
+
+    }
+
+    /* (non-Javadoc)
+     * @see com.hellblazer.pinkie.buffer.fsmExample.SimpleProtocol#sendGoodbye()
+     */
+    @Override
+    public void sendGoodbye() {
+        ByteBuffer buffer = bufferProtocol.getWriteBuffer();
         buffer.put((byte) MessageType.GOOD_BYE.ordinal());
         buffer.flip();
 
         bufferProtocol.selectForWrite();
-	}
-	
-	public void close() {
-		fsm.close();
-	}
+    }
 
+    public void close() {
+        fsm.close();
+    }
 
 }
