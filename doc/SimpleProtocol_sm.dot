@@ -32,21 +32,21 @@ digraph SimpleProtocol {
         "%start"
             [label="" shape=circle style=filled fillcolor=black width=0.25];
 
-        "push(SimpleServer::Accept)"
+        "push(SimpleClient::Connect)"
             [label="" shape=plaintext];
 
-        "push(SimpleClient::Connect)"
+        "push(SimpleServer::ConnectionAccepted)"
             [label="" shape=plaintext];
 
         //
         // Transitions (Edges)
         //
 
-        "Simple::Initial" -> "Simple::Connected::SimpleClient"
-            [label="accepted/\lpush(SimpleClient::Connect)\l"];
-
         "Simple::Initial" -> "Simple::Connected::SimpleServer"
-            [label="connected/\lpush(SimpleServer::Accept)\l"];
+            [label="accepted/\lpush(SimpleServer::ConnectionAccepted)\l"];
+
+        "Simple::Initial" -> "Simple::Connected::SimpleClient"
+            [label="connected/\lpush(SimpleClient::Connect)\l"];
 
         "Simple::Initial" -> "Simple::ProtocolError"
             [label="closing/\l"];
@@ -119,10 +119,10 @@ digraph SimpleProtocol {
 
         "%start" -> "Simple::Initial"
 
-        "push(SimpleServer::Accept)" -> "SimpleServer::Accept"
+        "push(SimpleClient::Connect)" -> "SimpleClient::Connect"
             [arrowtail=odot];
 
-        "push(SimpleClient::Connect)" -> "SimpleClient::Connect"
+        "push(SimpleServer::ConnectionAccepted)" -> "SimpleServer::ConnectionAccepted"
             [arrowtail=odot];
     }
 
@@ -315,8 +315,17 @@ digraph SimpleProtocol {
         // States (Nodes)
         //
 
-        "SimpleServer::Accept"
-            [label="{Accept}"];
+        "SimpleServer::ConnectionAccepted"
+            [label="{ConnectionAccepted}"];
+
+        "SimpleServer::SessionEstablished"
+            [label="{SessionEstablished}"];
+
+        "SimpleServer::ProcessMessage"
+            [label="{ProcessMessage}"];
+
+        "SimpleServer::AwaitMessage"
+            [label="{AwaitMessage}"];
 
         "SimpleServer::ProtocolError"
             [label="{ProtocolError}"];
@@ -336,32 +345,98 @@ digraph SimpleProtocol {
         "SimpleServer::%end"
             [label="" shape=doublecircle style=filled fillcolor=black width=0.15];
 
-        "push(SimpleServer::Accept)"
+        "push(SimpleServer::ConnectionAccepted)"
             [label="" shape=plaintext];
 
         //
         // Transitions (Edges)
         //
 
-        "SimpleServer::Accept" -> "SimpleServer::pop(protocolError)"
-            [label="accepted/\l"];
-
-        "SimpleServer::Accept" -> "SimpleServer::pop(closing)"
-            [label="closing/\l"];
-
-        "SimpleServer::Accept" -> "SimpleServer::pop(protocolError)"
-            [label="connected/\l"];
-
-        "SimpleServer::Accept" -> "SimpleServer::pop(readError)"
-            [label="readError/\l"];
-
-        "SimpleServer::Accept" -> "SimpleServer::pop(writeError)"
-            [label="writeError/\l"];
-
-        "SimpleServer::Accept" -> "SimpleServer::pop(protocolError)"
+        "SimpleServer::ConnectionAccepted" -> "SimpleServer::SessionEstablished"
             [label="readReady/\l"];
 
-        "SimpleServer::Accept" -> "SimpleServer::pop(protocolError)"
+        "SimpleServer::ConnectionAccepted" -> "SimpleServer::pop(protocolError)"
+            [label="accepted/\l"];
+
+        "SimpleServer::ConnectionAccepted" -> "SimpleServer::pop(closing)"
+            [label="closing/\l"];
+
+        "SimpleServer::ConnectionAccepted" -> "SimpleServer::pop(protocolError)"
+            [label="connected/\l"];
+
+        "SimpleServer::ConnectionAccepted" -> "SimpleServer::pop(readError)"
+            [label="readError/\l"];
+
+        "SimpleServer::ConnectionAccepted" -> "SimpleServer::pop(writeError)"
+            [label="writeError/\l"];
+
+        "SimpleServer::ConnectionAccepted" -> "SimpleServer::pop(protocolError)"
+            [label="writeReady/\l"];
+
+        "SimpleServer::SessionEstablished" -> "SimpleServer::AwaitMessage"
+            [label="writeReady/\l"];
+
+        "SimpleServer::SessionEstablished" -> "SimpleServer::pop(protocolError)"
+            [label="accepted/\l"];
+
+        "SimpleServer::SessionEstablished" -> "SimpleServer::pop(closing)"
+            [label="closing/\l"];
+
+        "SimpleServer::SessionEstablished" -> "SimpleServer::pop(protocolError)"
+            [label="connected/\l"];
+
+        "SimpleServer::SessionEstablished" -> "SimpleServer::pop(readError)"
+            [label="readError/\l"];
+
+        "SimpleServer::SessionEstablished" -> "SimpleServer::pop(writeError)"
+            [label="writeError/\l"];
+
+        "SimpleServer::SessionEstablished" -> "SimpleServer::pop(protocolError)"
+            [label="readReady/\l"];
+
+        "SimpleServer::ProcessMessage" -> "SimpleServer::AwaitMessage"
+            [label="messageProcessed/\l"];
+
+        "SimpleServer::ProcessMessage" -> "SimpleServer::pop(protocolError)"
+            [label="accepted/\l"];
+
+        "SimpleServer::ProcessMessage" -> "SimpleServer::pop(closing)"
+            [label="closing/\l"];
+
+        "SimpleServer::ProcessMessage" -> "SimpleServer::pop(protocolError)"
+            [label="connected/\l"];
+
+        "SimpleServer::ProcessMessage" -> "SimpleServer::pop(readError)"
+            [label="readError/\l"];
+
+        "SimpleServer::ProcessMessage" -> "SimpleServer::pop(writeError)"
+            [label="writeError/\l"];
+
+        "SimpleServer::ProcessMessage" -> "SimpleServer::pop(protocolError)"
+            [label="readReady/\l"];
+
+        "SimpleServer::ProcessMessage" -> "SimpleServer::pop(protocolError)"
+            [label="writeReady/\l"];
+
+        "SimpleServer::AwaitMessage" -> "SimpleServer::ProcessMessage"
+            [label="readReady/\l"];
+
+        "SimpleServer::AwaitMessage" -> "SimpleServer::pop(protocolError)"
+            [label="accepted/\l"];
+
+        "SimpleServer::AwaitMessage" -> "SimpleServer::pop(closing)"
+            [label="closing/\l"];
+
+        "SimpleServer::AwaitMessage" -> "SimpleServer::pop(protocolError)"
+            [label="connected/\l"];
+
+        "SimpleServer::AwaitMessage" -> "SimpleServer::pop(readError)"
+            [label="readError/\l"];
+
+        "SimpleServer::AwaitMessage" -> "SimpleServer::pop(writeError)"
+            [label="writeError/\l"];
+
+        "SimpleServer::AwaitMessage" -> "SimpleServer::pop(protocolError)"
             [label="writeReady/\l"];
 
         "SimpleServer::ProtocolError" -> "SimpleServer::pop(protocolError)"
@@ -397,7 +472,7 @@ digraph SimpleProtocol {
         "SimpleServer::pop(closing)" -> "SimpleServer::%end"
             [label="pop(closing);\l"];
 
-        "push(SimpleServer::Accept)" -> "SimpleServer::Accept"
+        "push(SimpleServer::ConnectionAccepted)" -> "SimpleServer::ConnectionAccepted"
             [arrowtail=odot];
     }
 

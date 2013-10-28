@@ -29,7 +29,9 @@ public interface SimpleProtocol {
 
     void setBufferProtocol(BufferProtocol bufferProtocol);
     
-    void establishSession();
+    void establishClientSession();
+    
+    void establishServerSession();
     
     void ackReceived();
 
@@ -47,6 +49,21 @@ public interface SimpleProtocol {
 	 * 
 	 */
 	void enableSend();
+
+	/**
+	 * 
+	 */
+	void awaitSession();
+
+	/**
+	 * 
+	 */
+	void processMessage();
+
+	/**
+	 * 
+	 */
+	void awaitMessage();
 
 
 }

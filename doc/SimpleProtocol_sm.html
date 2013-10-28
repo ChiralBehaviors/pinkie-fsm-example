@@ -267,7 +267,7 @@
         </td>
         <td>
           <pre>
-    establishSession();
+    establishClientSession();
           </pre>
         </td>
         <td>
@@ -492,7 +492,7 @@
         <th colspan=2>
           Actions
         </th>
-        <th colspan=8>
+        <th colspan=9>
           Transition
         </th>
       </tr>
@@ -517,6 +517,9 @@
           (BufferProtocol)
         </th>
         <th>
+          messageProcessed
+        </th>
+        <th>
           readError
         </th>
         <th>
@@ -534,7 +537,12 @@
       </tr>
       <tr>
         <td>
-          Accept
+          ConnectionAccepted
+        </td>
+        <td>
+          <pre>
+    awaitSession();
+          </pre>
         </td>
         <td>
         </td>
@@ -545,6 +553,78 @@
         <td>
         </td>
         <td>
+        </td>
+        <td>
+        </td>
+        <td>
+          <pre>
+  SessionEstablished
+  {}
+          </pre>
+        </td>
+        <td>
+        </td>
+        <td>
+        </td>
+        <td>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          SessionEstablished
+        </td>
+        <td>
+          <pre>
+    establishServerSession();
+          </pre>
+        </td>
+        <td>
+        </td>
+        <td>
+        </td>
+        <td>
+        </td>
+        <td>
+        </td>
+        <td>
+        </td>
+        <td>
+        </td>
+        <td>
+        </td>
+        <td>
+        </td>
+        <td>
+          <pre>
+  AwaitMessage
+  {}
+          </pre>
+        </td>
+        <td>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          ProcessMessage
+        </td>
+        <td>
+          <pre>
+    processMessage();
+          </pre>
+        </td>
+        <td>
+        </td>
+        <td>
+        </td>
+        <td>
+        </td>
+        <td>
+        </td>
+        <td>
+          <pre>
+  AwaitMessage
+  {}
+          </pre>
         </td>
         <td>
         </td>
@@ -559,7 +639,43 @@
       </tr>
       <tr>
         <td>
+          AwaitMessage
+        </td>
+        <td>
+          <pre>
+    awaitMessage();
+          </pre>
+        </td>
+        <td>
+        </td>
+        <td>
+        </td>
+        <td>
+        </td>
+        <td>
+        </td>
+        <td>
+        </td>
+        <td>
+        </td>
+        <td>
+          <pre>
+  ProcessMessage
+  {}
+          </pre>
+        </td>
+        <td>
+        </td>
+        <td>
+        </td>
+        <td>
+        </td>
+      </tr>
+      <tr>
+        <td>
           ProtocolError
+        </td>
+        <td>
         </td>
         <td>
         </td>

@@ -109,7 +109,7 @@ public class SimpleProtocolImpl implements SimpleProtocol {
 	}
 
 	@Override
-	public void establishSession() {
+	public void establishClientSession() {
 		ByteBuffer buffer = bufferProtocol.getWriteBuffer();
 		buffer.put((byte) MessageType.ESTABLISH.ordinal());
 		buffer.flip();
@@ -195,6 +195,91 @@ public class SimpleProtocolImpl implements SimpleProtocol {
 	@Override
 	public void enableSend() {
 		sendGate.open();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.hellblazer.pinkie.buffer.fsmExample.SimpleProtocol#establishServerSession
+	 * ()
+	 */
+	@Override
+	public void establishServerSession() {
+		ByteBuffer readBuffer = bufferProtocol.getReadBuffer();
+		readBuffer.rewind();
+		byte type = readBuffer.get();
+		readBuffer.limit(0);
+		readBuffer.rewind();
+		if (type != (byte) MessageType.ESTABLISH.ordinal()) {
+			fsm.protocolError();
+			return;
+		} 
+		ByteBuffer buffer = bufferProtocol.getWriteBuffer();
+		buffer.rewind();
+		buffer.limit(1);
+		buffer.put((byte) MessageType.ACK.ordinal());
+		bufferProtocol.setReadFullBuffer(false);
+		buffer.flip();
+		bufferProtocol.selectForWrite();
+		
+		
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.hellblazer.pinkie.buffer.fsmExample.SimpleProtocol#awaitSession()
+	 */
+	@Override
+	public void awaitSession() {
+		ByteBuffer readBuffer = bufferProtocol.getReadBuffer();
+		readBuffer.limit(1);
+		readBuffer.rewind();
+
+		// waiting for stuff to read...
+		bufferProtocol.selectForRead();
+
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.hellblazer.pinkie.buffer.fsmExample.SimpleProtocol#processMessage()
+	 */
+	@Override
+	public void processMessage() {
+		ByteBuffer readBuffer = bufferProtocol.getReadBuffer();
+		readBuffer.rewind();
+		byte type = readBuffer.get();
+
+		if (type != (byte) MessageType.MSG.ordinal()) {
+			fsm.protocolError();
+			return;
+		}
+
+		byte size = readBuffer.get();
+		byte[] message = new byte[size];
+		readBuffer.get(message);
+
+		readBuffer.limit(0);
+		readBuffer.rewind();
+
+		String msg = new String(message);
+		System.out.println(msg);
+		fsm.messageProcessed();
+
+	}
+
+	/* (non-Javadoc)
+	 * @see com.hellblazer.pinkie.buffer.fsmExample.SimpleProtocol#awaitMessage()
+	 */
+	@Override
+	public void awaitMessage() {
+		
+		
 	}
 
 }

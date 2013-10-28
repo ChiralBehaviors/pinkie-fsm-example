@@ -20,7 +20,7 @@ import com.hellblazer.pinkie.buffer.fsmExample.SimpleProtocol.MessageType;
 public class TestSimpleProtocol {
 
 	@Test
-	public void testEstablish() throws IOException {
+	public void testClientEstablish() throws IOException {
 		SimpleProtocolImpl protocol = new SimpleProtocolImpl();
 		BufferProtocolHandler handler = protocol.getBufferProtocolHandler();
 		BufferProtocol bufferProtocol = new BufferProtocol(protocol.getBufferProtocolHandler());
@@ -35,7 +35,7 @@ public class TestSimpleProtocol {
 		when(socketChannel.isConnected()).thenReturn(true);
 		assertEquals(SimpleProtocolContext.Simple.Initial, protocol.getCurrentState());
 		
-		commHandler.accept(socketHandler);
+		commHandler.connect(socketHandler);
 		assertEquals(SimpleProtocolContext.SimpleClient.Connect, protocol.getCurrentState());
 		
 		verify(socketHandler).selectForWrite();
@@ -57,5 +57,33 @@ public class TestSimpleProtocol {
 		protocol.close();
 		commHandler.closing();
 		assertEquals(SimpleProtocolContext.Simple.Closed, protocol.getCurrentState());
+	}
+	
+	@Test
+	public void testServerEstablish() throws IOException {
+		SimpleProtocolImpl protocol = new SimpleProtocolImpl();
+		BufferProtocolHandler handler = protocol.getBufferProtocolHandler();
+		BufferProtocol bufferProtocol = new BufferProtocol(protocol.getBufferProtocolHandler());
+		CommunicationsHandler commHandler = bufferProtocol.getHandler();
+		
+		SocketChannelHandler socketHandler = mock(SocketChannelHandler.class);
+		SocketChannel socketChannel = mock(SocketChannel.class);
+		when(socketHandler.getChannel()).thenReturn(socketChannel);
+		
+		when(socketChannel.getLocalAddress()).thenReturn(new InetSocketAddress(666));
+		when(socketChannel.getRemoteAddress()).thenReturn(new InetSocketAddress(668));
+		when(socketChannel.isConnected()).thenReturn(true);
+		assertEquals(SimpleProtocolContext.Simple.Initial, protocol.getCurrentState());
+		
+		commHandler.accept(socketHandler);
+		assertEquals(SimpleProtocolContext.SimpleServer.ConnectionAccepted, protocol.getCurrentState());
+
+		verify(socketHandler).selectForRead();
+		
+		bufferProtocol.getReadBuffer().put((byte)MessageType.ESTABLISH.ordinal());
+		handler.readReady();
+		assertEquals(SimpleProtocolContext.SimpleServer.SessionEstablished, protocol.getCurrentState());
+		
+		
 	}
 }
