@@ -94,6 +94,7 @@
 							<graph>true</graph>
 							<graphLevel>2</graphLevel>
 							<verbose>true</verbose>
+							<sync>true</sync>
 						</configuration>
 					</execution>
 				</executions>

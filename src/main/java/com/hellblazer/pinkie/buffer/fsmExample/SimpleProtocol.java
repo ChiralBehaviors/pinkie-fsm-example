@@ -27,7 +27,7 @@ public interface SimpleProtocol {
         ESTABLISH, MSG, ACK, GOOD_BYE;
     }
 
-    void setBufferProtocol(BufferProtocol bufferProtocol);
+    void setBufferProtocol(BufferProtocol bufferProtocol, String fsmName);
     
     void establishClientSession();
     
@@ -64,6 +64,15 @@ public interface SimpleProtocol {
 	 * 
 	 */
 	void awaitMessage();
+	
+	void logProtocolError(String message);
+
+	/**
+	 * 
+	 */
+	void awaitAck();
+
+	
 
 
 }

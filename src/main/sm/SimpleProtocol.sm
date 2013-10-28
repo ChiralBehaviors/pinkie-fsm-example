@@ -8,15 +8,13 @@
 %%
 Initial {
     accepted(bufferProtocol: BufferProtocol)
-        Connected/push(SimpleServer::ConnectionAccepted) {setBufferProtocol(bufferProtocol);}
+        Connected/push(SimpleServer::ConnectionAccepted) {setBufferProtocol(bufferProtocol, "server");}
         
     connected(bufferProtocol: BufferProtocol) 
-        Connected/push(SimpleClient::Connect) {setBufferProtocol(bufferProtocol);}
+        Connected/push(SimpleClient::Connect) {setBufferProtocol(bufferProtocol, "client");}
 }
 
 Connected {
-    protocolError
-        ProtocolError {}
     closing
         Closed {}
     readError
@@ -34,6 +32,9 @@ ProtocolError {
 Default { 
      
     closing()
+        ProtocolError {logProtocolError("closing");}
+        
+    protocolError
         ProtocolError {}
         
     readError()
@@ -43,10 +44,10 @@ Default {
         Closed {}
         
     readReady()
-        ProtocolError {}
+        ProtocolError {logProtocolError("readReady");}
         
     writeReady()
-        ProtocolError {}
+        ProtocolError {logProtocolError("writeReady");}
 }
 %%
 
@@ -58,23 +59,21 @@ Entry {
     establishClientSession();
 }
 {
-    readReady
-        SessionEstablished {}
+    writeReady
+        EstablishSession {}
 }
 
-SessionEstablished
+EstablishSession
 Entry {
-	ackReceived();
+	awaitAck();
 }	
  {
-    ackReceived     SendMessage{}
-    protocolError   pop(protocolError){}
+    
+    readReady       SendMessage{enableSend();}
 }
 
+
 SendMessage 
-Entry {
-    enableSend();
-}
 {
     transmitMessage(message: String) nil{ transmitMessage(message); }
     readReady AckMessage {}
@@ -100,7 +99,7 @@ Entry {
 
 Default {
     accepted(bufferProtocol: BufferProtocol)
-        pop(protocolError) {}
+        pop(protocolError) {logProtocolError("accepted");}
      
     closing()
         pop(closing) {}
@@ -109,16 +108,16 @@ Default {
         pop(protocolError) {}
         
     readError()
-        pop(readError) {}
+        pop(readError) {logProtocolError("readError");}
         
     writeError()
-        pop(writeError) {}
+        pop(writeError) {logProtocolError("writeError");}
         
     readReady()
-        pop(protocolError) {}
+        pop(protocolError) {logProtocolError("readReady");}
         
     writeReady()
-        pop(protocolError) {}
+        pop(protocolError) {logProtocolError("writeReady");}
 }
 %%
 
@@ -164,24 +163,24 @@ ProtocolError {
 
 Default {
     accepted(bufferProtocol: BufferProtocol)
-        pop(protocolError) {}
+        pop(protocolError) {logProtocolError("accepted");}
      
     closing()
         pop(closing) {}
         
     connected(bufferProtocol: BufferProtocol)
-        pop(protocolError) {}
+        pop(protocolError) {logProtocolError("connected");}
         
     readError()
-        pop(readError) {}
+        pop(readError) {logProtocolError("readError");}
         
     writeError()
-        pop(writeError) {}
+        pop(writeError) {logProtocolError("writeError");}
         
     readReady()
-        pop(protocolError) {}
+        pop(protocolError) {logProtocolError("readReady");}
         
     writeReady()
-        pop(protocolError) {}
+        pop(protocolError) {logProtocolError("writeReady");}
 }
 %%

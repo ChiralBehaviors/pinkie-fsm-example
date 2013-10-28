@@ -17,6 +17,9 @@ package com.hellblazer.pinkie.buffer.fsmExample;
 
 import java.nio.ByteBuffer;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.hellblazer.pinkie.buffer.BufferProtocol;
 import com.hellblazer.pinkie.buffer.BufferProtocolHandler;
 import com.hellblazer.pinkie.buffer.fsmExample.SimpleProtocolContext.SimpleProtocolState;
@@ -81,6 +84,9 @@ public class SimpleProtocolImpl implements SimpleProtocol {
 
 	private BufferProtocol bufferProtocol;
 
+	private static final Logger LOG = LoggerFactory
+			.getLogger(SimpleProtocolImpl.class);
+
 	private Gate sendGate;
 
 	public SimpleProtocolImpl() {
@@ -100,8 +106,9 @@ public class SimpleProtocolImpl implements SimpleProtocol {
 	}
 
 	@Override
-	public void setBufferProtocol(BufferProtocol bp) {
+	public void setBufferProtocol(BufferProtocol bp, String fsmName) {
 		bufferProtocol = bp;
+		fsm.setName(fsmName);
 	}
 
 	public BufferProtocolHandler getBufferProtocolHandler() {
@@ -111,14 +118,14 @@ public class SimpleProtocolImpl implements SimpleProtocol {
 	@Override
 	public void establishClientSession() {
 		ByteBuffer buffer = bufferProtocol.getWriteBuffer();
+		buffer.clear();
 		buffer.put((byte) MessageType.ESTABLISH.ordinal());
 		buffer.flip();
 		ByteBuffer readBuffer = bufferProtocol.getReadBuffer();
 		readBuffer.limit(1);
 		readBuffer.rewind();
 		bufferProtocol.selectForWrite();
-		// waiting for stuff to read...
-		bufferProtocol.selectForRead();
+
 	}
 
 	@Override
@@ -126,11 +133,12 @@ public class SimpleProtocolImpl implements SimpleProtocol {
 		ByteBuffer readBuffer = bufferProtocol.getReadBuffer();
 		readBuffer.rewind();
 		byte type = readBuffer.get();
-		readBuffer.limit(0);
-		readBuffer.rewind();
+		
 		if (type == (byte) MessageType.ACK.ordinal()) {
 			fsm.ackReceived();
 		} else {
+			LOG.error("Message type should be ACK but is {} instead",
+					MessageType.values()[type]);
 			fsm.protocolError();
 		}
 
@@ -209,9 +217,10 @@ public class SimpleProtocolImpl implements SimpleProtocol {
 		ByteBuffer readBuffer = bufferProtocol.getReadBuffer();
 		readBuffer.rewind();
 		byte type = readBuffer.get();
-		readBuffer.limit(0);
-		readBuffer.rewind();
+
 		if (type != (byte) MessageType.ESTABLISH.ordinal()) {
+			LOG.error("Message type should be ESTABLISH but is {} instead",
+					MessageType.values()[type]);
 			fsm.protocolError();
 			return;
 		}
@@ -255,20 +264,17 @@ public class SimpleProtocolImpl implements SimpleProtocol {
 		readBuffer.position(0);
 		byte type = readBuffer.get(0);
 
-		if (type == (byte) MessageType.MSG.ordinal()) 
-		{readMessage(readBuffer);}
-		
-		else if (type == (byte) MessageType.GOOD_BYE.ordinal())
-		{
+		if (type == (byte) MessageType.MSG.ordinal()) {
+			readMessage(readBuffer);
+		} else if (type == (byte) MessageType.GOOD_BYE.ordinal()) {
 			fsm.goodBye();
-		}
-		
-		else {
+		} else {
+			LOG.error(
+					"Message type should be MSG or GOOD_BYE but is {} instead",
+					MessageType.values()[type]);
 			fsm.protocolError();
 			return;
 		}
-
-		
 
 	}
 
@@ -282,9 +288,9 @@ public class SimpleProtocolImpl implements SimpleProtocol {
 			return;
 		}
 		byte size = readBuffer.get(1);
-		
-		//if the limit is less than the size, we still have
-		//to wait for more of the message
+
+		// if the limit is less than the size, we still have
+		// to wait for more of the message
 		if (readBuffer.limit() < size + 2) {
 			readBuffer.reset();
 			bufferProtocol.selectForRead();
@@ -312,8 +318,25 @@ public class SimpleProtocolImpl implements SimpleProtocol {
 	@Override
 	public void awaitMessage() {
 		ByteBuffer readBuffer = bufferProtocol.getReadBuffer();
-		readBuffer.limit(readBuffer.capacity());
+		readBuffer.clear();
 		bufferProtocol.selectForRead();
+	}
+	
+	@Override
+	public void logProtocolError(String message) {
+		LOG.error("PROTOCOL ERROR: Transition: {}", message);
+	}
+
+	/* (non-Javadoc)
+	 * @see com.hellblazer.pinkie.buffer.fsmExample.SimpleProtocol#awaitAck()
+	 */
+	@Override
+	public void awaitAck() {
+		ByteBuffer readBuffer = bufferProtocol.getReadBuffer();
+		readBuffer.clear();
+		readBuffer.limit(1);
+		bufferProtocol.selectForRead();
+		
 	}
 
 }

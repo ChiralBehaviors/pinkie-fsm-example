@@ -9,7 +9,11 @@
     </encoder>
   </appender>
 
-  <root level="debug">
+  <root level="trace">
     <appender-ref ref="STDERR" />
   </root>
+  
+  <logger name="com.hellblazer.pinkie" level="WARN" />
+  <logger name="com.hellblazer.pinkie.fsmExample" level="TRACE" />
+  
 </configuration>

@@ -70,7 +70,7 @@
           <pre>
   Connected/push(Simple::Initial)
   {
-    setBufferProtocol(bufferProtocol);
+    setBufferProtocol(bufferProtocol, "server");
   }
           </pre>
         </td>
@@ -80,7 +80,7 @@
           <pre>
   Connected/push(Simple::Initial)
   {
-    setBufferProtocol(bufferProtocol);
+    setBufferProtocol(bufferProtocol, "client");
   }
           </pre>
         </td>
@@ -116,10 +116,6 @@
         <td>
         </td>
         <td>
-          <pre>
-  ProtocolError
-  {}
-          </pre>
         </td>
         <td>
           <pre>
@@ -287,28 +283,40 @@
         <td>
         </td>
         <td>
+        </td>
+        <td>
+        </td>
+        <td>
+        </td>
+        <td>
           <pre>
-  SessionEstablished
+  EstablishSession
   {}
           </pre>
-        </td>
-        <td>
-        </td>
-        <td>
-        </td>
-        <td>
         </td>
         <td>
         </td>
       </tr>
       <tr>
         <td>
-          SessionEstablished
+          EstablishSession
         </td>
         <td>
           <pre>
-    ackReceived();
+    awaitAck();
           </pre>
+        </td>
+        <td>
+        </td>
+        <td>
+        </td>
+        <td>
+        </td>
+        <td>
+        </td>
+        <td>
+        </td>
+        <td>
         </td>
         <td>
         </td>
@@ -317,24 +325,10 @@
         <td>
           <pre>
   SendMessage
-  {}
+  {
+    enableSend();
+  }
           </pre>
-        </td>
-        <td>
-        </td>
-        <td>
-        </td>
-        <td>
-        </td>
-        <td>
-          <pre>
-  pop(protocolError)
-  {}
-          </pre>
-        </td>
-        <td>
-        </td>
-        <td>
         </td>
         <td>
         </td>
@@ -350,9 +344,6 @@
           SendMessage
         </td>
         <td>
-          <pre>
-    enableSend();
-          </pre>
         </td>
         <td>
         </td>
