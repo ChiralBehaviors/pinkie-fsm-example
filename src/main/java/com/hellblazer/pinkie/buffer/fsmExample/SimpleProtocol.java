@@ -36,12 +36,17 @@ public interface SimpleProtocol {
 	/**
 	 * @param message
 	 */
-	void sendMessage(String message);
+	void transmitMessage(String message);
 
 	/**
 	 * 
 	 */
 	void sendGoodbye();
+
+	/**
+	 * 
+	 */
+	void enableSend();
 
 
 }

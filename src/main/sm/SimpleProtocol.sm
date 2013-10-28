@@ -71,8 +71,12 @@ Entry {
     protocolError   pop(protocolError){}
 }
 
-SendMessage {
-    sendMessage(message: String) nil{ sendMessage(message); }
+SendMessage 
+Entry {
+    enableSend();
+}
+{
+    transmitMessage(message: String) nil{ transmitMessage(message); }
     readReady AckMessage {}
     close SendGoodbye{}
 }

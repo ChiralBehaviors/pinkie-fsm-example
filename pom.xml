@@ -193,6 +193,11 @@
 			<artifactId>pinkie</artifactId>
 			<version>0.0.2-SNAPSHOT</version>
 		</dependency>
+		<dependency>
+            <groupId>com.hellblazer</groupId>
+            <artifactId>utils</artifactId>
+            <version>0.0.1</version>
+        </dependency>
 	</dependencies>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
