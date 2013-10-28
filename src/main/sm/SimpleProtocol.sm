@@ -147,6 +147,7 @@ Entry {
 }
 {
     messageProcessed    AwaitMessage {}
+    goodBye     pop(closing){}
 }
 
 AwaitMessage
@@ -155,6 +156,7 @@ Entry {
 }
 {
     readReady   ProcessMessage {}
+    
 }
 
 ProtocolError {

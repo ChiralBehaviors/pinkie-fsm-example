@@ -214,7 +214,7 @@ public class SimpleProtocolImpl implements SimpleProtocol {
 		if (type != (byte) MessageType.ESTABLISH.ordinal()) {
 			fsm.protocolError();
 			return;
-		} 
+		}
 		ByteBuffer buffer = bufferProtocol.getWriteBuffer();
 		buffer.rewind();
 		buffer.limit(1);
@@ -222,8 +222,7 @@ public class SimpleProtocolImpl implements SimpleProtocol {
 		bufferProtocol.setReadFullBuffer(false);
 		buffer.flip();
 		bufferProtocol.selectForWrite();
-		
-		
+
 	}
 
 	/*
@@ -252,16 +251,48 @@ public class SimpleProtocolImpl implements SimpleProtocol {
 	@Override
 	public void processMessage() {
 		ByteBuffer readBuffer = bufferProtocol.getReadBuffer();
-		readBuffer.rewind();
-		byte type = readBuffer.get();
+		readBuffer.mark();
+		readBuffer.position(0);
+		byte type = readBuffer.get(0);
 
-		if (type != (byte) MessageType.MSG.ordinal()) {
+		if (type == (byte) MessageType.MSG.ordinal()) 
+		{readMessage(readBuffer);}
+		
+		else if (type == (byte) MessageType.GOOD_BYE.ordinal())
+		{
+			fsm.goodBye();
+		}
+		
+		else {
 			fsm.protocolError();
 			return;
 		}
 
-		byte size = readBuffer.get();
+		
+
+	}
+
+	/**
+	 * @param readBuffer
+	 */
+	private void readMessage(ByteBuffer readBuffer) {
+		if (readBuffer.limit() < 2) {
+			readBuffer.reset();
+			bufferProtocol.selectForRead();
+			return;
+		}
+		byte size = readBuffer.get(1);
+		
+		//if the limit is less than the size, we still have
+		//to wait for more of the message
+		if (readBuffer.limit() < size + 2) {
+			readBuffer.reset();
+			bufferProtocol.selectForRead();
+			return;
+		}
+
 		byte[] message = new byte[size];
+		readBuffer.position(2);
 		readBuffer.get(message);
 
 		readBuffer.limit(0);
@@ -270,16 +301,19 @@ public class SimpleProtocolImpl implements SimpleProtocol {
 		String msg = new String(message);
 		System.out.println(msg);
 		fsm.messageProcessed();
-
 	}
 
-	/* (non-Javadoc)
-	 * @see com.hellblazer.pinkie.buffer.fsmExample.SimpleProtocol#awaitMessage()
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.hellblazer.pinkie.buffer.fsmExample.SimpleProtocol#awaitMessage()
 	 */
 	@Override
 	public void awaitMessage() {
-		
-		
+		ByteBuffer readBuffer = bufferProtocol.getReadBuffer();
+		readBuffer.limit(readBuffer.capacity());
+		bufferProtocol.selectForRead();
 	}
 
 }

@@ -7,6 +7,7 @@ import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
 
 import org.junit.Test;
@@ -84,6 +85,29 @@ public class TestSimpleProtocol {
 		handler.readReady();
 		assertEquals(SimpleProtocolContext.SimpleServer.SessionEstablished, protocol.getCurrentState());
 		
+		assertEquals(1, bufferProtocol.getWriteBuffer().limit());
+		assertEquals((byte)MessageType.ACK.ordinal(), bufferProtocol.getWriteBuffer().get(0));
+		
+		bufferProtocol.getWriteBuffer().rewind();
+		
+		handler.writeReady();
+		
+		assertEquals(SimpleProtocolContext.SimpleServer.AwaitMessage, protocol.getCurrentState());
+		
+		ByteBuffer buffer = bufferProtocol.getReadBuffer();
+		buffer.put((byte)MessageType.MSG.ordinal());
+		
+		String msg = "Hello Cleveland";
+		buffer.put((byte)msg.length());
+		buffer.put(msg.getBytes());
+		handler.readReady();
+		
+		assertEquals(SimpleProtocolContext.SimpleServer.AwaitMessage, protocol.getCurrentState());
+		
+		buffer.put((byte)MessageType.GOOD_BYE.ordinal());
+		handler.readReady();
+		assertEquals(SimpleProtocolContext.Simple.Closed, protocol.getCurrentState());
 		
 	}
+	
 }

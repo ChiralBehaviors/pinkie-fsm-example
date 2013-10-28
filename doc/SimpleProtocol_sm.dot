@@ -397,6 +397,9 @@ digraph SimpleProtocol {
         "SimpleServer::ProcessMessage" -> "SimpleServer::AwaitMessage"
             [label="messageProcessed/\l"];
 
+        "SimpleServer::ProcessMessage" -> "SimpleServer::pop(closing)"
+            [label="goodBye/\l"];
+
         "SimpleServer::ProcessMessage" -> "SimpleServer::pop(protocolError)"
             [label="accepted/\l"];
 
