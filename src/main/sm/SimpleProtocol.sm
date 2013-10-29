@@ -78,6 +78,7 @@ SendMessage
     transmitMessage(message: String) nil{ transmitMessage(message); }
     readReady AckMessage {}
     close SendGoodbye{}
+    writeReady nil{}
 }
 
 SendGoodbye 
@@ -85,6 +86,7 @@ Entry {
     sendGoodbye();
 }
 {
+    writeReady nil{}
     closing pop(closing){}
 }
 
@@ -94,7 +96,6 @@ Entry {
 }
 {
     ackReceived     SendMessage{}
-    protocolError pop(protocolError){}
 }
 
 Default {

@@ -203,7 +203,7 @@
         <th colspan=2>
           Actions
         </th>
-        <th colspan=12>
+        <th colspan=11>
           Transition
         </th>
       </tr>
@@ -232,9 +232,6 @@
           connected
           <br>
           (BufferProtocol)
-        </th>
-        <th>
-          protocolError
         </th>
         <th>
           readError
@@ -287,8 +284,6 @@
         <td>
         </td>
         <td>
-        </td>
-        <td>
           <pre>
   EstablishSession
   {}
@@ -305,8 +300,6 @@
           <pre>
     awaitAck();
           </pre>
-        </td>
-        <td>
         </td>
         <td>
         </td>
@@ -364,8 +357,6 @@
         <td>
         </td>
         <td>
-        </td>
-        <td>
           <pre>
   AckMessage
   {}
@@ -382,6 +373,10 @@
         <td>
         </td>
         <td>
+          <pre>
+  SendMessage
+  {}
+          </pre>
         </td>
         <td>
         </td>
@@ -420,8 +415,10 @@
         <td>
         </td>
         <td>
-        </td>
-        <td>
+          <pre>
+  SendGoodbye
+  {}
+          </pre>
         </td>
         <td>
         </td>
@@ -450,12 +447,6 @@
         <td>
         </td>
         <td>
-        </td>
-        <td>
-          <pre>
-  pop(protocolError)
-  {}
-          </pre>
         </td>
         <td>
         </td>

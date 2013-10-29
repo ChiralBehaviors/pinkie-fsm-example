@@ -243,9 +243,6 @@ digraph SimpleProtocol {
         "SimpleClient::SendMessage" -> "SimpleClient::pop(writeError)"
             [label="writeError/\l"];
 
-        "SimpleClient::SendMessage" -> "SimpleClient::pop(protocolError)"
-            [label="writeReady/\l"];
-
         "SimpleClient::SendGoodbye" -> "SimpleClient::pop(closing)"
             [label="closing/\l"];
 
@@ -264,14 +261,8 @@ digraph SimpleProtocol {
         "SimpleClient::SendGoodbye" -> "SimpleClient::pop(protocolError)"
             [label="readReady/\l"];
 
-        "SimpleClient::SendGoodbye" -> "SimpleClient::pop(protocolError)"
-            [label="writeReady/\l"];
-
         "SimpleClient::AckMessage" -> "SimpleClient::SendMessage"
             [label="ackReceived/\l"];
-
-        "SimpleClient::AckMessage" -> "SimpleClient::pop(protocolError)"
-            [label="protocolError/\l"];
 
         "SimpleClient::AckMessage" -> "SimpleClient::pop(protocolError)"
             [label="accepted/\l"];
