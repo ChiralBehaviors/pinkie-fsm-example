@@ -27,52 +27,28 @@ public interface SimpleProtocol {
         ESTABLISH, MSG, ACK, GOOD_BYE;
     }
 
-    void setBufferProtocol(BufferProtocol bufferProtocol, String fsmName);
-    
-    void establishClientSession();
-    
-    void establishServerSession();
-    
     void ackReceived();
 
-	/**
-	 * @param message
-	 */
-	void transmitMessage(String message);
+    void awaitAck();
 
-	/**
-	 * 
-	 */
-	void sendGoodbye();
+    void awaitMessage();
 
-	/**
-	 * 
-	 */
-	void enableSend();
+    void awaitSession();
 
-	/**
-	 * 
-	 */
-	void awaitSession();
+    void enableSend();
 
-	/**
-	 * 
-	 */
-	void processMessage();
+    void establishClientSession();
 
-	/**
-	 * 
-	 */
-	void awaitMessage();
-	
-	void logProtocolError(String message);
+    void establishServerSession();
 
-	/**
-	 * 
-	 */
-	void awaitAck();
+    void logProtocolError(String message);
 
-	
+    void processMessage();
 
+    void sendGoodbye();
+
+    void setBufferProtocol(BufferProtocol bufferProtocol, String fsmName);
+
+    void transmitMessage(String message);
 
 }

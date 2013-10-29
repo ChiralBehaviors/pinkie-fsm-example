@@ -24,17 +24,17 @@ import com.hellblazer.pinkie.buffer.fsmExample.SimpleProtocolImpl.MessageHandler
 
 public class SimpleProtocolFactory implements CommunicationsHandlerFactory {
 
-	private final MessageHandler handler;
-	
-    /**
-	 * @param handler
-	 */
-	public SimpleProtocolFactory(MessageHandler handler) {
-		super();
-		this.handler = handler;
-	}
+    private final MessageHandler handler;
 
-	@Override
+    /**
+     * @param handler
+     */
+    public SimpleProtocolFactory(MessageHandler handler) {
+        super();
+        this.handler = handler;
+    }
+
+    @Override
     public CommunicationsHandler createCommunicationsHandler(SocketChannel channel) {
         return new BufferProtocol(
                                   new SimpleProtocolImpl(handler).getBufferProtocolHandler()).getHandler();

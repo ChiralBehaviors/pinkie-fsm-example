@@ -31,6 +31,11 @@ import com.hellblazer.utils.Gate;
  * 
  */
 public class SimpleProtocolImpl implements SimpleProtocol {
+    public static interface MessageHandler {
+
+        void handle(String message);
+    }
+
     private class BufferProtocolHandlerImpl implements BufferProtocolHandler {
 
         @Override
@@ -79,11 +84,6 @@ public class SimpleProtocolImpl implements SimpleProtocol {
         }
     }
 
-    public static interface MessageHandler {
-
-        void handle(String message);
-    }
-
     private final BufferProtocolHandlerImpl handler;
     private final SimpleProtocolContext     fsm;
 
@@ -102,39 +102,6 @@ public class SimpleProtocolImpl implements SimpleProtocol {
         this.messageHandler = messageHandler;
     }
 
-    public void send(String msg) {
-        try {
-            sendGate.await();
-            fsm.transmitMessage(msg);
-        } catch (InterruptedException e) {
-            return;
-        }
-
-    }
-
-    @Override
-    public void setBufferProtocol(BufferProtocol bp, String fsmName) {
-        bufferProtocol = bp;
-        fsm.setName(fsmName);
-    }
-
-    public BufferProtocolHandler getBufferProtocolHandler() {
-        return handler;
-    }
-
-    @Override
-    public void establishClientSession() {
-        ByteBuffer buffer = bufferProtocol.getWriteBuffer();
-        buffer.clear();
-        buffer.put((byte) MessageType.ESTABLISH.ordinal());
-        buffer.flip();
-        ByteBuffer readBuffer = bufferProtocol.getReadBuffer();
-        readBuffer.limit(1);
-        readBuffer.rewind();
-        bufferProtocol.selectForWrite();
-
-    }
-
     @Override
     public void ackReceived() {
         ByteBuffer readBuffer = bufferProtocol.getReadBuffer();
@@ -151,35 +118,14 @@ public class SimpleProtocolImpl implements SimpleProtocol {
 
     }
 
-    /**
-     * @return
-     */
-    public SimpleProtocolState getCurrentState() {
-        return fsm.getState();
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * com.hellblazer.pinkie.buffer.fsmExample.SimpleProtocol#sendMessage(com
-     * .hellblazer.pinkie.buffer.fsmExample.Message)
+    /* (non-Javadoc)
+     * @see com.hellblazer.pinkie.buffer.fsmExample.SimpleProtocol#awaitAck()
      */
     @Override
-    public void transmitMessage(String message) {
-        ByteBuffer buffer = bufferProtocol.getWriteBuffer();
-        buffer.rewind();
-        buffer.limit(message.length() + 2);
-        buffer.put((byte) MessageType.MSG.ordinal());
-        bufferProtocol.setReadFullBuffer(false);
-        buffer.put((byte) message.length());
-        buffer.put(message.getBytes());
-        buffer.flip();
-        bufferProtocol.selectForWrite();
-
-        // clear the buffer of all the old crap
+    public void awaitAck() {
         ByteBuffer readBuffer = bufferProtocol.getReadBuffer();
-        readBuffer.limit(258);
+        readBuffer.clear();
+        readBuffer.limit(1);
         bufferProtocol.selectForRead();
 
     }
@@ -187,15 +133,31 @@ public class SimpleProtocolImpl implements SimpleProtocol {
     /*
      * (non-Javadoc)
      * 
-     * @see com.hellblazer.pinkie.buffer.fsmExample.SimpleProtocol#sendGoodbye()
+     * @see
+     * com.hellblazer.pinkie.buffer.fsmExample.SimpleProtocol#awaitMessage()
      */
     @Override
-    public void sendGoodbye() {
-        ByteBuffer buffer = bufferProtocol.getWriteBuffer();
-        buffer.put((byte) MessageType.GOOD_BYE.ordinal());
-        buffer.flip();
+    public void awaitMessage() {
+        ByteBuffer readBuffer = bufferProtocol.getReadBuffer();
+        readBuffer.clear();
+        bufferProtocol.selectForRead();
+    }
 
-        bufferProtocol.selectForWrite();
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * com.hellblazer.pinkie.buffer.fsmExample.SimpleProtocol#awaitSession()
+     */
+    @Override
+    public void awaitSession() {
+        ByteBuffer readBuffer = bufferProtocol.getReadBuffer();
+        readBuffer.limit(1);
+        readBuffer.rewind();
+
+        // waiting for stuff to read...
+        bufferProtocol.selectForRead();
+
     }
 
     public void close() {
@@ -210,6 +172,19 @@ public class SimpleProtocolImpl implements SimpleProtocol {
     @Override
     public void enableSend() {
         sendGate.open();
+    }
+
+    @Override
+    public void establishClientSession() {
+        ByteBuffer buffer = bufferProtocol.getWriteBuffer();
+        buffer.clear();
+        buffer.put((byte) MessageType.ESTABLISH.ordinal());
+        buffer.flip();
+        ByteBuffer readBuffer = bufferProtocol.getReadBuffer();
+        readBuffer.limit(1);
+        readBuffer.rewind();
+        bufferProtocol.selectForWrite();
+
     }
 
     /*
@@ -241,21 +216,21 @@ public class SimpleProtocolImpl implements SimpleProtocol {
 
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * com.hellblazer.pinkie.buffer.fsmExample.SimpleProtocol#awaitSession()
+    public BufferProtocolHandler getBufferProtocolHandler() {
+        return handler;
+    }
+
+    /**
+     * @return
      */
+    public SimpleProtocolState getCurrentState() {
+        return fsm.getState();
+    }
+
     @Override
-    public void awaitSession() {
-        ByteBuffer readBuffer = bufferProtocol.getReadBuffer();
-        readBuffer.limit(1);
-        readBuffer.rewind();
-
-        // waiting for stuff to read...
-        bufferProtocol.selectForRead();
-
+    public void logProtocolError(String message) {
+        LOG.error("PROTOCOL ERROR: Transition: {}, FSM: {}", message,
+                  fsm.getName());
     }
 
     /*
@@ -281,6 +256,62 @@ public class SimpleProtocolImpl implements SimpleProtocol {
             fsm.protocolError();
             return;
         }
+
+    }
+
+    public void send(String msg) {
+        try {
+            sendGate.await();
+            fsm.transmitMessage(msg);
+        } catch (InterruptedException e) {
+            return;
+        }
+
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.hellblazer.pinkie.buffer.fsmExample.SimpleProtocol#sendGoodbye()
+     */
+    @Override
+    public void sendGoodbye() {
+        ByteBuffer buffer = bufferProtocol.getWriteBuffer();
+        buffer.put((byte) MessageType.GOOD_BYE.ordinal());
+        buffer.flip();
+
+        bufferProtocol.selectForWrite();
+    }
+
+    @Override
+    public void setBufferProtocol(BufferProtocol bp, String fsmName) {
+        bufferProtocol = bp;
+        fsm.setName(fsmName);
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * com.hellblazer.pinkie.buffer.fsmExample.SimpleProtocol#sendMessage(com
+     * .hellblazer.pinkie.buffer.fsmExample.Message)
+     */
+    @Override
+    public void transmitMessage(String message) {
+        ByteBuffer buffer = bufferProtocol.getWriteBuffer();
+        buffer.rewind();
+        buffer.limit(message.length() + 2);
+        buffer.put((byte) MessageType.MSG.ordinal());
+        bufferProtocol.setReadFullBuffer(false);
+        buffer.put((byte) message.length());
+        buffer.put(message.getBytes());
+        buffer.flip();
+        bufferProtocol.selectForWrite();
+
+        // clear the buffer of all the old crap
+        ByteBuffer readBuffer = bufferProtocol.getReadBuffer();
+        readBuffer.limit(258);
+        bufferProtocol.selectForRead();
 
     }
 
@@ -313,37 +344,6 @@ public class SimpleProtocolImpl implements SimpleProtocol {
         String msg = new String(message);
         messageHandler.handle(msg);
         fsm.messageProcessed();
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * com.hellblazer.pinkie.buffer.fsmExample.SimpleProtocol#awaitMessage()
-     */
-    @Override
-    public void awaitMessage() {
-        ByteBuffer readBuffer = bufferProtocol.getReadBuffer();
-        readBuffer.clear();
-        bufferProtocol.selectForRead();
-    }
-
-    @Override
-    public void logProtocolError(String message) {
-        LOG.error("PROTOCOL ERROR: Transition: {}, FSM: {}", message,
-                  fsm.getName());
-    }
-
-    /* (non-Javadoc)
-     * @see com.hellblazer.pinkie.buffer.fsmExample.SimpleProtocol#awaitAck()
-     */
-    @Override
-    public void awaitAck() {
-        ByteBuffer readBuffer = bufferProtocol.getReadBuffer();
-        readBuffer.clear();
-        readBuffer.limit(1);
-        bufferProtocol.selectForRead();
-
     }
 
 }

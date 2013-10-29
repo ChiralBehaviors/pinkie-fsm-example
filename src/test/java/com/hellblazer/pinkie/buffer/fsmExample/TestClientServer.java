@@ -15,7 +15,8 @@
  */
 package com.hellblazer.pinkie.buffer.fsmExample;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -41,85 +42,89 @@ import com.hellblazer.utils.Utils;
  */
 public class TestClientServer {
 
-	private ChannelHandler clientHandler;
-	private ServerSocketChannelHandler serverHandler;
-	private final AtomicReference<String> messageReceived = new AtomicReference<String>();
+    private ChannelHandler                clientHandler;
+    private ServerSocketChannelHandler    serverHandler;
+    private final AtomicReference<String> messageReceived = new AtomicReference<String>();
 
-	@Test
-	public void testClientServer() throws IOException {
+    @After
+    public void cleanUp() {
+        if (clientHandler != null) {
+            clientHandler.terminate();
+        }
+        if (serverHandler != null) {
+            serverHandler.terminate();
+        }
+    }
 
-		int bufferSize = 12;
-		SocketOptions socketOptions = new SocketOptions();
-		socketOptions.setSend_buffer_size(bufferSize);
-		socketOptions.setReceive_buffer_size(bufferSize);
-		socketOptions.setTimeout(100);
+    @Test
+    public void testClientServer() throws IOException {
 
-		constructClientHandler(socketOptions);
-		constructServerHandler(socketOptions);
-		serverHandler.start();
-		clientHandler.start();
+        int bufferSize = 12;
+        SocketOptions socketOptions = new SocketOptions();
+        socketOptions.setSend_buffer_size(bufferSize);
+        socketOptions.setReceive_buffer_size(bufferSize);
+        socketOptions.setTimeout(100);
 
-		final SimpleProtocolImpl client = new SimpleProtocolImpl(null);
-		BufferProtocol clientProtocol = new BufferProtocol(
-				client.getBufferProtocolHandler());
-		clientHandler.connectTo(serverHandler.getLocalAddress(),
-				clientProtocol.getHandler());
+        constructClientHandler(socketOptions);
+        constructServerHandler(socketOptions);
+        serverHandler.start();
+        clientHandler.start();
 
-		assertTrue(Utils.waitForCondition(1000, new Condition() {
+        final SimpleProtocolImpl client = new SimpleProtocolImpl(null);
+        BufferProtocol clientProtocol = new BufferProtocol(
+                                                           client.getBufferProtocolHandler());
+        clientHandler.connectTo(serverHandler.getLocalAddress(),
+                                clientProtocol.getHandler());
 
-			@Override
-			public boolean isTrue() {
-				try {
-					return client.getCurrentState().equals(
-							SimpleProtocolContext.SimpleClient.SendMessage);
-				} catch (StateUndefinedException e) {
-					return false;
-				}
-			}
-		}));
-		String msg = "God this hurts";
-		client.send(msg);
-		assertTrue(Utils.waitForCondition(1000, new Condition() {
+        assertTrue(Utils.waitForCondition(1000, new Condition() {
 
-			@Override
-			public boolean isTrue() {
+            @Override
+            public boolean isTrue() {
+                try {
+                    return client.getCurrentState().equals(SimpleProtocolContext.SimpleClient.SendMessage);
+                } catch (StateUndefinedException e) {
+                    return false;
+                }
+            }
+        }));
+        String msg = "God this hurts";
+        client.send(msg);
+        assertTrue(Utils.waitForCondition(1000, new Condition() {
 
-				return messageReceived.get() != null;
+            @Override
+            public boolean isTrue() {
 
-			}
-		}));
-		assertEquals(msg, messageReceived.get());
-	}
+                return messageReceived.get() != null;
 
-	private void constructClientHandler(SocketOptions socketOptions)
-			throws IOException {
-		clientHandler = new ChannelHandler("Client", socketOptions,
-				Executors.newCachedThreadPool());
-	}
+            }
+        }));
+        assertEquals(msg, messageReceived.get());
+    }
 
-	private void constructServerHandler(SocketOptions socketOptions)
-			throws IOException {
-		serverHandler = new ServerSocketChannelHandler("Server", socketOptions,
-				new InetSocketAddress("127.0.0.1", 0),
-				Executors.newCachedThreadPool(), new SimpleProtocolFactory(
-						new MessageHandler() {
+    private void constructClientHandler(SocketOptions socketOptions)
+                                                                    throws IOException {
+        clientHandler = new ChannelHandler("Client", socketOptions,
+                                           Executors.newCachedThreadPool());
+    }
 
-							@Override
-							public void handle(String message) {
+    private void constructServerHandler(SocketOptions socketOptions)
+                                                                    throws IOException {
+        serverHandler = new ServerSocketChannelHandler(
+                                                       "Server",
+                                                       socketOptions,
+                                                       new InetSocketAddress(
+                                                                             "127.0.0.1",
+                                                                             0),
+                                                       Executors.newCachedThreadPool(),
+                                                       new SimpleProtocolFactory(
+                                                                                 new MessageHandler() {
 
-								messageReceived.set(message);
-							}
-						}));
-	}
+                                                                                     @Override
+                                                                                     public void handle(String message) {
 
-	@After
-	public void cleanUp() {
-		if (clientHandler != null) {
-			clientHandler.terminate();
-		}
-		if (serverHandler != null) {
-			serverHandler.terminate();
-		}
-	}
+                                                                                         messageReceived.set(message);
+                                                                                     }
+                                                                                 }));
+    }
 
 }

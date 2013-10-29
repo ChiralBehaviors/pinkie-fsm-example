@@ -36,124 +36,124 @@ import com.hellblazer.pinkie.buffer.fsmExample.SimpleProtocolImpl.MessageHandler
 
 public class TestSimpleProtocol {
 
-	@Test
-	public void testClientEstablish() throws IOException {
-		SimpleProtocolImpl protocol = new SimpleProtocolImpl(null);
-		BufferProtocolHandler handler = protocol.getBufferProtocolHandler();
-		BufferProtocol bufferProtocol = new BufferProtocol(
-				protocol.getBufferProtocolHandler());
-		CommunicationsHandler commHandler = bufferProtocol.getHandler();
+    @Test
+    public void testClientEstablish() throws IOException {
+        SimpleProtocolImpl protocol = new SimpleProtocolImpl(null);
+        BufferProtocolHandler handler = protocol.getBufferProtocolHandler();
+        BufferProtocol bufferProtocol = new BufferProtocol(
+                                                           protocol.getBufferProtocolHandler());
+        CommunicationsHandler commHandler = bufferProtocol.getHandler();
 
-		SocketChannelHandler socketHandler = mock(SocketChannelHandler.class);
-		SocketChannel socketChannel = mock(SocketChannel.class);
-		when(socketHandler.getChannel()).thenReturn(socketChannel);
+        SocketChannelHandler socketHandler = mock(SocketChannelHandler.class);
+        SocketChannel socketChannel = mock(SocketChannel.class);
+        when(socketHandler.getChannel()).thenReturn(socketChannel);
 
-		when(socketChannel.getLocalAddress()).thenReturn(
-				new InetSocketAddress(666));
-		when(socketChannel.getRemoteAddress()).thenReturn(
-				new InetSocketAddress(668));
-		when(socketChannel.isConnected()).thenReturn(true);
-		assertEquals(SimpleProtocolContext.Simple.Initial,
-				protocol.getCurrentState());
+        when(socketChannel.getLocalAddress()).thenReturn(new InetSocketAddress(
+                                                                               666));
+        when(socketChannel.getRemoteAddress()).thenReturn(new InetSocketAddress(
+                                                                                668));
+        when(socketChannel.isConnected()).thenReturn(true);
+        assertEquals(SimpleProtocolContext.Simple.Initial,
+                     protocol.getCurrentState());
 
-		commHandler.connect(socketHandler);
-		assertEquals(SimpleProtocolContext.SimpleClient.Connect,
-				protocol.getCurrentState());
+        commHandler.connect(socketHandler);
+        assertEquals(SimpleProtocolContext.SimpleClient.Connect,
+                     protocol.getCurrentState());
 
-		verify(socketHandler).selectForWrite();
-		handler.writeReady();
+        verify(socketHandler).selectForWrite();
+        handler.writeReady();
 
-		assertEquals(SimpleProtocolContext.SimpleClient.EstablishSession,
-				protocol.getCurrentState());
-		verify(socketHandler).selectForRead();
-		bufferProtocol.getReadBuffer().put((byte) MessageType.ACK.ordinal());
-		handler.readReady();
-		assertEquals(SimpleProtocolContext.SimpleClient.SendMessage,
-				protocol.getCurrentState());
+        assertEquals(SimpleProtocolContext.SimpleClient.EstablishSession,
+                     protocol.getCurrentState());
+        verify(socketHandler).selectForRead();
+        bufferProtocol.getReadBuffer().put((byte) MessageType.ACK.ordinal());
+        handler.readReady();
+        assertEquals(SimpleProtocolContext.SimpleClient.SendMessage,
+                     protocol.getCurrentState());
 
-		bufferProtocol.getReadBuffer().rewind();
-		String message = "HELLO CLEVELAND!";
-		protocol.send(message);
-		assertEquals(SimpleProtocolContext.SimpleClient.SendMessage,
-				protocol.getCurrentState());
+        bufferProtocol.getReadBuffer().rewind();
+        String message = "HELLO CLEVELAND!";
+        protocol.send(message);
+        assertEquals(SimpleProtocolContext.SimpleClient.SendMessage,
+                     protocol.getCurrentState());
 
-		bufferProtocol.getReadBuffer().put((byte) MessageType.ACK.ordinal());
-		handler.readReady();
-		assertEquals(SimpleProtocolContext.SimpleClient.SendMessage,
-				protocol.getCurrentState());
+        bufferProtocol.getReadBuffer().put((byte) MessageType.ACK.ordinal());
+        handler.readReady();
+        assertEquals(SimpleProtocolContext.SimpleClient.SendMessage,
+                     protocol.getCurrentState());
 
-		protocol.close();
-		commHandler.closing();
-		assertEquals(SimpleProtocolContext.Simple.Closed,
-				protocol.getCurrentState());
-	}
+        protocol.close();
+        commHandler.closing();
+        assertEquals(SimpleProtocolContext.Simple.Closed,
+                     protocol.getCurrentState());
+    }
 
-	@Test
-	public void testServerEstablish() throws IOException {
-		SimpleProtocolImpl protocol = new SimpleProtocolImpl(new MessageHandler() {
-			
-			@Override
-			public void handle(String message) {
-				System.out.println(message);
-				
-			}
-		}); 
-		BufferProtocolHandler handler = protocol.getBufferProtocolHandler();
-		BufferProtocol bufferProtocol = new BufferProtocol(
-				protocol.getBufferProtocolHandler());
-		CommunicationsHandler commHandler = bufferProtocol.getHandler();
+    @Test
+    public void testServerEstablish() throws IOException {
+        SimpleProtocolImpl protocol = new SimpleProtocolImpl(
+                                                             new MessageHandler() {
 
-		SocketChannelHandler socketHandler = mock(SocketChannelHandler.class);
-		SocketChannel socketChannel = mock(SocketChannel.class);
-		when(socketHandler.getChannel()).thenReturn(socketChannel);
+                                                                 @Override
+                                                                 public void handle(String message) {
+                                                                     System.out.println(message);
 
-		when(socketChannel.getLocalAddress()).thenReturn(
-				new InetSocketAddress(666));
-		when(socketChannel.getRemoteAddress()).thenReturn(
-				new InetSocketAddress(668));
-		when(socketChannel.isConnected()).thenReturn(true);
-		assertEquals(SimpleProtocolContext.Simple.Initial,
-				protocol.getCurrentState());
+                                                                 }
+                                                             });
+        BufferProtocolHandler handler = protocol.getBufferProtocolHandler();
+        BufferProtocol bufferProtocol = new BufferProtocol(
+                                                           protocol.getBufferProtocolHandler());
+        CommunicationsHandler commHandler = bufferProtocol.getHandler();
 
-		commHandler.accept(socketHandler);
-		assertEquals(SimpleProtocolContext.SimpleServer.ConnectionAccepted,
-				protocol.getCurrentState());
+        SocketChannelHandler socketHandler = mock(SocketChannelHandler.class);
+        SocketChannel socketChannel = mock(SocketChannel.class);
+        when(socketHandler.getChannel()).thenReturn(socketChannel);
 
-		verify(socketHandler).selectForRead();
+        when(socketChannel.getLocalAddress()).thenReturn(new InetSocketAddress(
+                                                                               666));
+        when(socketChannel.getRemoteAddress()).thenReturn(new InetSocketAddress(
+                                                                                668));
+        when(socketChannel.isConnected()).thenReturn(true);
+        assertEquals(SimpleProtocolContext.Simple.Initial,
+                     protocol.getCurrentState());
 
-		bufferProtocol.getReadBuffer().put(
-				(byte) MessageType.ESTABLISH.ordinal());
-		handler.readReady();
-		assertEquals(SimpleProtocolContext.SimpleServer.SessionEstablished,
-				protocol.getCurrentState());
+        commHandler.accept(socketHandler);
+        assertEquals(SimpleProtocolContext.SimpleServer.ConnectionAccepted,
+                     protocol.getCurrentState());
 
-		assertEquals(1, bufferProtocol.getWriteBuffer().limit());
-		assertEquals((byte) MessageType.ACK.ordinal(), bufferProtocol
-				.getWriteBuffer().get(0));
+        verify(socketHandler).selectForRead();
 
-		bufferProtocol.getWriteBuffer().rewind();
+        bufferProtocol.getReadBuffer().put((byte) MessageType.ESTABLISH.ordinal());
+        handler.readReady();
+        assertEquals(SimpleProtocolContext.SimpleServer.SessionEstablished,
+                     protocol.getCurrentState());
 
-		handler.writeReady();
+        assertEquals(1, bufferProtocol.getWriteBuffer().limit());
+        assertEquals((byte) MessageType.ACK.ordinal(),
+                     bufferProtocol.getWriteBuffer().get(0));
 
-		assertEquals(SimpleProtocolContext.SimpleServer.AwaitMessage,
-				protocol.getCurrentState());
+        bufferProtocol.getWriteBuffer().rewind();
 
-		ByteBuffer buffer = bufferProtocol.getReadBuffer();
-		buffer.put((byte) MessageType.MSG.ordinal());
+        handler.writeReady();
 
-		String msg = "Hello Cleveland";
-		buffer.put((byte) msg.length());
-		buffer.put(msg.getBytes());
-		handler.readReady();
+        assertEquals(SimpleProtocolContext.SimpleServer.AwaitMessage,
+                     protocol.getCurrentState());
 
-		assertEquals(SimpleProtocolContext.SimpleServer.AwaitMessage,
-				protocol.getCurrentState());
+        ByteBuffer buffer = bufferProtocol.getReadBuffer();
+        buffer.put((byte) MessageType.MSG.ordinal());
 
-		buffer.put((byte) MessageType.GOOD_BYE.ordinal());
-		handler.readReady();
-		assertEquals(SimpleProtocolContext.Simple.Closed,
-				protocol.getCurrentState());
+        String msg = "Hello Cleveland";
+        buffer.put((byte) msg.length());
+        buffer.put(msg.getBytes());
+        handler.readReady();
 
-	}
+        assertEquals(SimpleProtocolContext.SimpleServer.AwaitMessage,
+                     protocol.getCurrentState());
+
+        buffer.put((byte) MessageType.GOOD_BYE.ordinal());
+        handler.readReady();
+        assertEquals(SimpleProtocolContext.Simple.Closed,
+                     protocol.getCurrentState());
+
+    }
 
 }
