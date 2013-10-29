@@ -9,25 +9,21 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
-import java.util.concurrent.Executors;
 
 import org.junit.Test;
 
-import com.hellblazer.pinkie.ChannelHandler;
 import com.hellblazer.pinkie.CommunicationsHandler;
-import com.hellblazer.pinkie.ServerSocketChannelHandler;
 import com.hellblazer.pinkie.SocketChannelHandler;
-import com.hellblazer.pinkie.SocketOptions;
 import com.hellblazer.pinkie.buffer.BufferProtocol;
-import com.hellblazer.pinkie.buffer.BufferProtocolFactory;
 import com.hellblazer.pinkie.buffer.BufferProtocolHandler;
 import com.hellblazer.pinkie.buffer.fsmExample.SimpleProtocol.MessageType;
+import com.hellblazer.pinkie.buffer.fsmExample.SimpleProtocolImpl.MessageHandler;
 
 public class TestSimpleProtocol {
 
 	@Test
 	public void testClientEstablish() throws IOException {
-		SimpleProtocolImpl protocol = new SimpleProtocolImpl();
+		SimpleProtocolImpl protocol = new SimpleProtocolImpl(null);
 		BufferProtocolHandler handler = protocol.getBufferProtocolHandler();
 		BufferProtocol bufferProtocol = new BufferProtocol(
 				protocol.getBufferProtocolHandler());
@@ -79,7 +75,14 @@ public class TestSimpleProtocol {
 
 	@Test
 	public void testServerEstablish() throws IOException {
-		SimpleProtocolImpl protocol = new SimpleProtocolImpl();
+		SimpleProtocolImpl protocol = new SimpleProtocolImpl(new MessageHandler() {
+			
+			@Override
+			public void handle(String message) {
+				System.out.println(message);
+				
+			}
+		}); 
 		BufferProtocolHandler handler = protocol.getBufferProtocolHandler();
 		BufferProtocol bufferProtocol = new BufferProtocol(
 				protocol.getBufferProtocolHandler());

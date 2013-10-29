@@ -78,6 +78,11 @@ public class SimpleProtocolImpl implements SimpleProtocol {
 			fsm.writeReady();
 		}
 	}
+	
+	public static interface MessageHandler {
+		
+		void handle(String message);
+	}
 
 	private final BufferProtocolHandlerImpl handler;
 	private final SimpleProtocolContext fsm;
@@ -88,11 +93,14 @@ public class SimpleProtocolImpl implements SimpleProtocol {
 			.getLogger(SimpleProtocolImpl.class);
 
 	private Gate sendGate;
+	
+	private final MessageHandler messageHandler;
 
-	public SimpleProtocolImpl() {
+	public SimpleProtocolImpl(MessageHandler messageHandler) {
 		fsm = new SimpleProtocolContext(this);
 		handler = new BufferProtocolHandlerImpl();
 		sendGate = new Gate();
+		this.messageHandler = messageHandler;
 	}
 
 	public void send(String msg) {
@@ -305,7 +313,7 @@ public class SimpleProtocolImpl implements SimpleProtocol {
 		readBuffer.rewind();
 
 		String msg = new String(message);
-		System.out.println(msg);
+		messageHandler.handle(msg);
 		fsm.messageProcessed();
 	}
 

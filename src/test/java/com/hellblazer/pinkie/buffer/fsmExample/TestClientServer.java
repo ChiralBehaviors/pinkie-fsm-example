@@ -26,9 +26,12 @@
 
 package com.hellblazer.pinkie.buffer.fsmExample;
 
+import static org.junit.Assert.*;
+
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.junit.After;
 import org.junit.Test;
@@ -39,10 +42,9 @@ import com.hellblazer.pinkie.ChannelHandler;
 import com.hellblazer.pinkie.ServerSocketChannelHandler;
 import com.hellblazer.pinkie.SocketOptions;
 import com.hellblazer.pinkie.buffer.BufferProtocol;
+import com.hellblazer.pinkie.buffer.fsmExample.SimpleProtocolImpl.MessageHandler;
 import com.hellblazer.utils.Condition;
 import com.hellblazer.utils.Utils;
-
-import static org.junit.Assert.*;
 
 /**
  * @author hparry
@@ -52,6 +54,7 @@ public class TestClientServer {
 
 	private ChannelHandler clientHandler;
 	private ServerSocketChannelHandler serverHandler;
+	private final AtomicReference<String> messageReceived = new AtomicReference<String>();
 
 	@Test
 	public void testClientServer() throws IOException {
@@ -67,23 +70,36 @@ public class TestClientServer {
 		serverHandler.start();
 		clientHandler.start();
 
-		final SimpleProtocolImpl client = new SimpleProtocolImpl();
+		final SimpleProtocolImpl client = new SimpleProtocolImpl(null);
 		BufferProtocol clientProtocol = new BufferProtocol(
 				client.getBufferProtocolHandler());
 		clientHandler.connectTo(serverHandler.getLocalAddress(),
 				clientProtocol.getHandler());
-		
+
 		assertTrue(Utils.waitForCondition(1000, new Condition() {
-			
+
 			@Override
 			public boolean isTrue() {
 				try {
-					return client.getCurrentState().equals(SimpleProtocolContext.SimpleClient.SendMessage);
+					return client.getCurrentState().equals(
+							SimpleProtocolContext.SimpleClient.SendMessage);
 				} catch (StateUndefinedException e) {
 					return false;
 				}
 			}
 		}));
+		String msg = "God this hurts";
+		client.send(msg);
+		assertTrue(Utils.waitForCondition(1000, new Condition() {
+
+			@Override
+			public boolean isTrue() {
+
+				return messageReceived.get() != null;
+
+			}
+		}));
+		assertEquals(msg, messageReceived.get());
 	}
 
 	private void constructClientHandler(SocketOptions socketOptions)
@@ -96,7 +112,15 @@ public class TestClientServer {
 			throws IOException {
 		serverHandler = new ServerSocketChannelHandler("Server", socketOptions,
 				new InetSocketAddress("127.0.0.1", 0),
-				Executors.newCachedThreadPool(), new SimpleProtocolFactory());
+				Executors.newCachedThreadPool(), new SimpleProtocolFactory(
+						new MessageHandler() {
+
+							@Override
+							public void handle(String message) {
+
+								messageReceived.set(message);
+							}
+						}));
 	}
 
 	@After

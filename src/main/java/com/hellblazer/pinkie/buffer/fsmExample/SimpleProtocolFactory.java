@@ -20,13 +20,24 @@ import java.nio.channels.SocketChannel;
 import com.hellblazer.pinkie.CommunicationsHandler;
 import com.hellblazer.pinkie.CommunicationsHandlerFactory;
 import com.hellblazer.pinkie.buffer.BufferProtocol;
+import com.hellblazer.pinkie.buffer.fsmExample.SimpleProtocolImpl.MessageHandler;
 
 public class SimpleProtocolFactory implements CommunicationsHandlerFactory {
 
-    @Override
+	private final MessageHandler handler;
+	
+    /**
+	 * @param handler
+	 */
+	public SimpleProtocolFactory(MessageHandler handler) {
+		super();
+		this.handler = handler;
+	}
+
+	@Override
     public CommunicationsHandler createCommunicationsHandler(SocketChannel channel) {
         return new BufferProtocol(
-                                  new SimpleProtocolImpl().getBufferProtocolHandler()).getHandler();
+                                  new SimpleProtocolImpl(handler).getBufferProtocolHandler()).getHandler();
     }
 
 }
