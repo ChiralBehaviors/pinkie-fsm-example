@@ -75,10 +75,21 @@ Entry {
 
 SendMessage 
 {
-    transmitMessage(message: String) nil{ transmitMessage(message); }
-    readReady AckMessage {}
+    transmitMessage(message: String) MessageSent{ transmitMessage(message); }
     close SendGoodbye{}
-    writeReady nil{}
+}
+
+MessageSent
+{
+    writeReady AwaitAck{}
+}
+
+AwaitAck 
+Entry {
+    awaitAck();
+}
+{
+    readReady AckMessage{}
 }
 
 SendGoodbye 
