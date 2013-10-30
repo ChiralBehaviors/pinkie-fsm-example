@@ -152,6 +152,12 @@ digraph SimpleProtocol {
         "SimpleClient::SendMessage"
             [label="{SendMessage}"];
 
+        "SimpleClient::MessageSent"
+            [label="{MessageSent}"];
+
+        "SimpleClient::AwaitAck"
+            [label="{AwaitAck}"];
+
         "SimpleClient::SendGoodbye"
             [label="{SendGoodbye}"];
 
@@ -222,8 +228,8 @@ digraph SimpleProtocol {
         "SimpleClient::EstablishSession" -> "SimpleClient::pop(protocolError)"
             [label="writeReady/\l"];
 
-        "SimpleClient::SendMessage" -> "SimpleClient::AckMessage"
-            [label="readReady/\l"];
+        "SimpleClient::SendMessage" -> "SimpleClient::MessageSent"
+            [label="transmitMessage/\l"];
 
         "SimpleClient::SendMessage" -> "SimpleClient::SendGoodbye"
             [label="close/\l"];
@@ -242,6 +248,54 @@ digraph SimpleProtocol {
 
         "SimpleClient::SendMessage" -> "SimpleClient::pop(writeError)"
             [label="writeError/\l"];
+
+        "SimpleClient::SendMessage" -> "SimpleClient::pop(protocolError)"
+            [label="readReady/\l"];
+
+        "SimpleClient::SendMessage" -> "SimpleClient::pop(protocolError)"
+            [label="writeReady/\l"];
+
+        "SimpleClient::MessageSent" -> "SimpleClient::AwaitAck"
+            [label="writeReady/\l"];
+
+        "SimpleClient::MessageSent" -> "SimpleClient::pop(protocolError)"
+            [label="accepted/\l"];
+
+        "SimpleClient::MessageSent" -> "SimpleClient::pop(closing)"
+            [label="closing/\l"];
+
+        "SimpleClient::MessageSent" -> "SimpleClient::pop(protocolError)"
+            [label="connected/\l"];
+
+        "SimpleClient::MessageSent" -> "SimpleClient::pop(readError)"
+            [label="readError/\l"];
+
+        "SimpleClient::MessageSent" -> "SimpleClient::pop(writeError)"
+            [label="writeError/\l"];
+
+        "SimpleClient::MessageSent" -> "SimpleClient::pop(protocolError)"
+            [label="readReady/\l"];
+
+        "SimpleClient::AwaitAck" -> "SimpleClient::AckMessage"
+            [label="readReady/\l"];
+
+        "SimpleClient::AwaitAck" -> "SimpleClient::pop(protocolError)"
+            [label="accepted/\l"];
+
+        "SimpleClient::AwaitAck" -> "SimpleClient::pop(closing)"
+            [label="closing/\l"];
+
+        "SimpleClient::AwaitAck" -> "SimpleClient::pop(protocolError)"
+            [label="connected/\l"];
+
+        "SimpleClient::AwaitAck" -> "SimpleClient::pop(readError)"
+            [label="readError/\l"];
+
+        "SimpleClient::AwaitAck" -> "SimpleClient::pop(writeError)"
+            [label="writeError/\l"];
+
+        "SimpleClient::AwaitAck" -> "SimpleClient::pop(protocolError)"
+            [label="writeReady/\l"];
 
         "SimpleClient::SendGoodbye" -> "SimpleClient::pop(closing)"
             [label="closing/\l"];

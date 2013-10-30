@@ -74,9 +74,12 @@ public class TestSimpleProtocol {
         bufferProtocol.getReadBuffer().rewind();
         String message = "HELLO CLEVELAND!";
         protocol.send(message);
-        assertEquals(SimpleProtocolContext.SimpleClient.SendMessage,
+        assertEquals(SimpleProtocolContext.SimpleClient.MessageSent,
                      protocol.getCurrentState());
 
+        handler.writeReady();
+        assertEquals(SimpleProtocolContext.SimpleClient.AwaitAck,
+                protocol.getCurrentState());
         bufferProtocol.getReadBuffer().put((byte) MessageType.ACK.ordinal());
         handler.readReady();
         assertEquals(SimpleProtocolContext.SimpleClient.SendMessage,
