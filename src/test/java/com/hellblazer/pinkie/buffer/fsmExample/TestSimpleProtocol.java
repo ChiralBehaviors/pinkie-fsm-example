@@ -33,6 +33,9 @@ import com.hellblazer.pinkie.buffer.BufferProtocol;
 import com.hellblazer.pinkie.buffer.BufferProtocolHandler;
 import com.hellblazer.pinkie.buffer.fsmExample.SimpleProtocol.MessageType;
 import com.hellblazer.pinkie.buffer.fsmExample.SimpleProtocolImpl.MessageHandler;
+import com.hellblazer.pinkie.buffer.fsmExample.fsm.Simple;
+import com.hellblazer.pinkie.buffer.fsmExample.fsm.SimpleClient;
+import com.hellblazer.pinkie.buffer.fsmExample.fsm.SimpleServer;
 
 public class TestSimpleProtocol {
 
@@ -53,41 +56,41 @@ public class TestSimpleProtocol {
         when(socketChannel.getRemoteAddress()).thenReturn(new InetSocketAddress(
                                                                                 668));
         when(socketChannel.isConnected()).thenReturn(true);
-        assertEquals(SimpleProtocolContext.Simple.Initial,
+        assertEquals(Simple.Initial,
                      protocol.getCurrentState());
 
         commHandler.connect(socketHandler);
-        assertEquals(SimpleProtocolContext.SimpleClient.Connect,
+        assertEquals(SimpleClient.Connected,
                      protocol.getCurrentState());
 
         verify(socketHandler).selectForWrite();
         handler.writeReady();
 
-        assertEquals(SimpleProtocolContext.SimpleClient.EstablishSession,
+        assertEquals(SimpleClient.EstablishSession,
                      protocol.getCurrentState());
         verify(socketHandler).selectForRead();
         bufferProtocol.getReadBuffer().put((byte) MessageType.ACK.ordinal());
         handler.readReady();
-        assertEquals(SimpleProtocolContext.SimpleClient.SendMessage,
+        assertEquals(SimpleClient.SendMessage,
                      protocol.getCurrentState());
 
         bufferProtocol.getReadBuffer().rewind();
         String message = "HELLO CLEVELAND!";
         protocol.send(message);
-        assertEquals(SimpleProtocolContext.SimpleClient.MessageSent,
+        assertEquals(SimpleClient.MessageSent,
                      protocol.getCurrentState());
 
         handler.writeReady();
-        assertEquals(SimpleProtocolContext.SimpleClient.AwaitAck,
+        assertEquals(SimpleClient.AwaitAck,
                 protocol.getCurrentState());
         bufferProtocol.getReadBuffer().put((byte) MessageType.ACK.ordinal());
         handler.readReady();
-        assertEquals(SimpleProtocolContext.SimpleClient.SendMessage,
+        assertEquals(SimpleClient.SendMessage,
                      protocol.getCurrentState());
 
         protocol.close();
         commHandler.closing();
-        assertEquals(SimpleProtocolContext.Simple.Closed,
+        assertEquals(Simple.Closed,
                      protocol.getCurrentState());
     }
 
@@ -116,18 +119,18 @@ public class TestSimpleProtocol {
         when(socketChannel.getRemoteAddress()).thenReturn(new InetSocketAddress(
                                                                                 668));
         when(socketChannel.isConnected()).thenReturn(true);
-        assertEquals(SimpleProtocolContext.Simple.Initial,
+        assertEquals(Simple.Initial,
                      protocol.getCurrentState());
 
         commHandler.accept(socketHandler);
-        assertEquals(SimpleProtocolContext.SimpleServer.ConnectionAccepted,
+        assertEquals(SimpleServer.Accepted,
                      protocol.getCurrentState());
 
         verify(socketHandler).selectForRead();
 
         bufferProtocol.getReadBuffer().put((byte) MessageType.ESTABLISH.ordinal());
         handler.readReady();
-        assertEquals(SimpleProtocolContext.SimpleServer.SessionEstablished,
+        assertEquals(SimpleServer.SessionEstablished,
                      protocol.getCurrentState());
 
         assertEquals(1, bufferProtocol.getWriteBuffer().limit());
@@ -138,7 +141,7 @@ public class TestSimpleProtocol {
 
         handler.writeReady();
 
-        assertEquals(SimpleProtocolContext.SimpleServer.AwaitMessage,
+        assertEquals(SimpleServer.AwaitMessage,
                      protocol.getCurrentState());
 
         ByteBuffer buffer = bufferProtocol.getReadBuffer();
@@ -149,12 +152,12 @@ public class TestSimpleProtocol {
         buffer.put(msg.getBytes());
         handler.readReady();
 
-        assertEquals(SimpleProtocolContext.SimpleServer.AwaitMessage,
+        assertEquals(SimpleServer.AwaitMessage,
                      protocol.getCurrentState());
 
         buffer.put((byte) MessageType.GOOD_BYE.ordinal());
         handler.readReady();
-        assertEquals(SimpleProtocolContext.Simple.Closed,
+        assertEquals(Simple.Closed,
                      protocol.getCurrentState());
 
     }

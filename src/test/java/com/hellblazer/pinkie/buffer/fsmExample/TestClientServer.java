@@ -33,6 +33,7 @@ import com.hellblazer.pinkie.ServerSocketChannelHandler;
 import com.hellblazer.pinkie.SocketOptions;
 import com.hellblazer.pinkie.buffer.BufferProtocol;
 import com.hellblazer.pinkie.buffer.fsmExample.SimpleProtocolImpl.MessageHandler;
+import com.hellblazer.pinkie.buffer.fsmExample.fsm.SimpleClient;
 import com.hellblazer.utils.Condition;
 import com.hellblazer.utils.Utils;
 
@@ -81,7 +82,7 @@ public class TestClientServer {
             @Override
             public boolean isTrue() {
                 try {
-                    return client.getCurrentState().equals(SimpleProtocolContext.SimpleClient.SendMessage);
+                    return client.getCurrentState().equals(SimpleClient.SendMessage);
                 } catch (StateUndefinedException e) {
                     return false;
                 }

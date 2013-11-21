@@ -22,7 +22,9 @@ import org.slf4j.LoggerFactory;
 
 import com.hellblazer.pinkie.buffer.BufferProtocol;
 import com.hellblazer.pinkie.buffer.BufferProtocolHandler;
-import com.hellblazer.pinkie.buffer.fsmExample.SimpleProtocolContext.SimpleProtocolState;
+import com.hellblazer.pinkie.buffer.fsmExample.fsm.Simple;
+import com.hellblazer.pinkie.buffer.fsmExample.fsm.SimpleFsm;
+import com.hellblazer.tron.Fsm;
 import com.hellblazer.utils.Gate;
 
 /**
@@ -40,17 +42,17 @@ public class SimpleProtocolImpl implements SimpleProtocol {
 
         @Override
         public void accepted(BufferProtocol bufferProtocol) {
-            fsm.accepted(bufferProtocol);
+            fsm.getTransitions().accepted(bufferProtocol);
         }
 
         @Override
         public void closing() {
-            fsm.closing();
+            fsm.getTransitions().closing();
         }
 
         @Override
         public void connected(BufferProtocol bufferProtocol) {
-            fsm.connected(bufferProtocol);
+            fsm.getTransitions().connected(bufferProtocol);
         }
 
         @Override
@@ -65,27 +67,27 @@ public class SimpleProtocolImpl implements SimpleProtocol {
 
         @Override
         public void readError() {
-            fsm.readError();
+            fsm.getTransitions().readError();
         }
 
         @Override
         public void readReady() {
-            fsm.readReady();
+            fsm.getTransitions().readReady();
         }
 
         @Override
         public void writeError() {
-            fsm.writeError();
+            fsm.getTransitions().writeError();
         }
 
         @Override
         public void writeReady() {
-            fsm.writeReady();
+            fsm.getTransitions().writeReady();
         }
     }
 
     private final BufferProtocolHandlerImpl handler;
-    private final SimpleProtocolContext     fsm;
+    private final Fsm<SimpleProtocol, SimpleFsm>     fsm;
 
     private BufferProtocol                  bufferProtocol;
 
@@ -96,7 +98,7 @@ public class SimpleProtocolImpl implements SimpleProtocol {
     private final MessageHandler            messageHandler;
 
     public SimpleProtocolImpl(MessageHandler messageHandler) {
-        fsm = new SimpleProtocolContext(this);
+        fsm = Fsm.construct((SimpleProtocol) this, SimpleFsm.class, Simple.Initial, true);
         handler = new BufferProtocolHandlerImpl();
         sendGate = new Gate();
         this.messageHandler = messageHandler;
@@ -109,11 +111,11 @@ public class SimpleProtocolImpl implements SimpleProtocol {
         byte type = readBuffer.get();
 
         if (type == (byte) MessageType.ACK.ordinal()) {
-            fsm.ackReceived();
+            fsm.getTransitions().ackReceived();
         } else {
             LOG.error("Message type should be ACK but is {} instead",
                       MessageType.values()[type]);
-            fsm.protocolError();
+            fsm.getTransitions().protocolError();
         }
 
     }
@@ -161,7 +163,7 @@ public class SimpleProtocolImpl implements SimpleProtocol {
     }
 
     public void close() {
-        fsm.close();
+        fsm.getTransitions().close();
     }
 
     /*
@@ -203,7 +205,7 @@ public class SimpleProtocolImpl implements SimpleProtocol {
         if (type != (byte) MessageType.ESTABLISH.ordinal()) {
             LOG.error("Message type should be ESTABLISH but is {} instead",
                       MessageType.values()[type]);
-            fsm.protocolError();
+            fsm.getTransitions().protocolError();
             return;
         }
         ByteBuffer buffer = bufferProtocol.getWriteBuffer();
@@ -223,14 +225,14 @@ public class SimpleProtocolImpl implements SimpleProtocol {
     /**
      * @return
      */
-    public SimpleProtocolState getCurrentState() {
-        return fsm.getState();
+    public SimpleFsm getCurrentState() {
+        return fsm.getCurrentState();
     }
 
     @Override
     public void logProtocolError(String message) {
         LOG.error("PROTOCOL ERROR: Transition: {}, FSM: {}", message,
-                  fsm.getName());
+                  fsm);
     }
 
     /*
@@ -249,11 +251,11 @@ public class SimpleProtocolImpl implements SimpleProtocol {
         if (type == (byte) MessageType.MSG.ordinal()) {
             readMessage(readBuffer);
         } else if (type == (byte) MessageType.GOOD_BYE.ordinal()) {
-            fsm.goodBye();
+            fsm.getTransitions().goodBye();
         } else {
             LOG.error("Message type should be MSG or GOOD_BYE but is {} instead",
                       MessageType.values()[type]);
-            fsm.protocolError();
+            fsm.getTransitions().protocolError();
             return;
         }
 
@@ -262,7 +264,7 @@ public class SimpleProtocolImpl implements SimpleProtocol {
     public void send(String msg) {
         try {
             sendGate.await();
-            fsm.transmitMessage(msg);
+            fsm.getTransitions().transmitMessage(msg);
         } catch (InterruptedException e) {
             return;
         }
@@ -343,7 +345,7 @@ public class SimpleProtocolImpl implements SimpleProtocol {
 
         String msg = new String(message);
         messageHandler.handle(msg);
-        fsm.messageProcessed();
+        fsm.getTransitions().messageProcessed();
     }
 
 }
