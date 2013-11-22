@@ -56,42 +56,34 @@ public class TestSimpleProtocol {
         when(socketChannel.getRemoteAddress()).thenReturn(new InetSocketAddress(
                                                                                 668));
         when(socketChannel.isConnected()).thenReturn(true);
-        assertEquals(Simple.Initial,
-                     protocol.getCurrentState());
+        assertEquals(Simple.Initial, protocol.getCurrentState());
 
         commHandler.connect(socketHandler);
-        assertEquals(SimpleClient.Connected,
-                     protocol.getCurrentState());
+        assertEquals(SimpleClient.Connected, protocol.getCurrentState());
 
         verify(socketHandler).selectForWrite();
         handler.writeReady();
 
-        assertEquals(SimpleClient.EstablishSession,
-                     protocol.getCurrentState());
+        assertEquals(SimpleClient.EstablishSession, protocol.getCurrentState());
         verify(socketHandler).selectForRead();
         bufferProtocol.getReadBuffer().put((byte) MessageType.ACK.ordinal());
         handler.readReady();
-        assertEquals(SimpleClient.SendMessage,
-                     protocol.getCurrentState());
+        assertEquals(SimpleClient.SendMessage, protocol.getCurrentState());
 
         bufferProtocol.getReadBuffer().rewind();
         String message = "HELLO CLEVELAND!";
         protocol.send(message);
-        assertEquals(SimpleClient.MessageSent,
-                     protocol.getCurrentState());
+        assertEquals(SimpleClient.MessageSent, protocol.getCurrentState());
 
         handler.writeReady();
-        assertEquals(SimpleClient.AwaitAck,
-                protocol.getCurrentState());
+        assertEquals(SimpleClient.AwaitAck, protocol.getCurrentState());
         bufferProtocol.getReadBuffer().put((byte) MessageType.ACK.ordinal());
         handler.readReady();
-        assertEquals(SimpleClient.SendMessage,
-                     protocol.getCurrentState());
+        assertEquals(SimpleClient.SendMessage, protocol.getCurrentState());
 
         protocol.close();
         commHandler.closing();
-        assertEquals(Simple.Closed,
-                     protocol.getCurrentState());
+        assertEquals(Simple.Closed, protocol.getCurrentState());
     }
 
     @Test
@@ -119,12 +111,10 @@ public class TestSimpleProtocol {
         when(socketChannel.getRemoteAddress()).thenReturn(new InetSocketAddress(
                                                                                 668));
         when(socketChannel.isConnected()).thenReturn(true);
-        assertEquals(Simple.Initial,
-                     protocol.getCurrentState());
+        assertEquals(Simple.Initial, protocol.getCurrentState());
 
         commHandler.accept(socketHandler);
-        assertEquals(SimpleServer.Accepted,
-                     protocol.getCurrentState());
+        assertEquals(SimpleServer.Accepted, protocol.getCurrentState());
 
         verify(socketHandler).selectForRead();
 
@@ -141,8 +131,7 @@ public class TestSimpleProtocol {
 
         handler.writeReady();
 
-        assertEquals(SimpleServer.AwaitMessage,
-                     protocol.getCurrentState());
+        assertEquals(SimpleServer.AwaitMessage, protocol.getCurrentState());
 
         ByteBuffer buffer = bufferProtocol.getReadBuffer();
         buffer.put((byte) MessageType.MSG.ordinal());
@@ -152,13 +141,11 @@ public class TestSimpleProtocol {
         buffer.put(msg.getBytes());
         handler.readReady();
 
-        assertEquals(SimpleServer.AwaitMessage,
-                     protocol.getCurrentState());
+        assertEquals(SimpleServer.AwaitMessage, protocol.getCurrentState());
 
         buffer.put((byte) MessageType.GOOD_BYE.ordinal());
         handler.readReady();
-        assertEquals(Simple.Closed,
-                     protocol.getCurrentState());
+        assertEquals(Simple.Closed, protocol.getCurrentState());
 
     }
 

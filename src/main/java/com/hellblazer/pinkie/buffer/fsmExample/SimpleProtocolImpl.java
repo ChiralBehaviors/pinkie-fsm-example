@@ -86,19 +86,20 @@ public class SimpleProtocolImpl implements SimpleProtocol {
         }
     }
 
-    private final BufferProtocolHandlerImpl handler;
-    private final Fsm<SimpleProtocol, SimpleFsm>     fsm;
+    private final BufferProtocolHandlerImpl      handler;
+    private final Fsm<SimpleProtocol, SimpleFsm> fsm;
 
-    private BufferProtocol                  bufferProtocol;
+    private BufferProtocol                       bufferProtocol;
 
-    private static final Logger             LOG = LoggerFactory.getLogger(SimpleProtocolImpl.class);
+    private static final Logger                  LOG = LoggerFactory.getLogger(SimpleProtocolImpl.class);
 
-    private Gate                            sendGate;
+    private Gate                                 sendGate;
 
-    private final MessageHandler            messageHandler;
+    private final MessageHandler                 messageHandler;
 
     public SimpleProtocolImpl(MessageHandler messageHandler) {
-        fsm = Fsm.construct((SimpleProtocol) this, SimpleFsm.class, Simple.Initial, true);
+        fsm = Fsm.construct((SimpleProtocol) this, SimpleFsm.class,
+                            Simple.Initial, true);
         handler = new BufferProtocolHandlerImpl();
         sendGate = new Gate();
         this.messageHandler = messageHandler;
@@ -218,10 +219,6 @@ public class SimpleProtocolImpl implements SimpleProtocol {
 
     }
 
-    public BufferProtocolHandler getBufferProtocolHandler() {
-        return handler;
-    }
-
     /**
      * @return
      */
@@ -231,8 +228,7 @@ public class SimpleProtocolImpl implements SimpleProtocol {
 
     @Override
     public void logProtocolError(String message) {
-        LOG.error("PROTOCOL ERROR: Transition: {}, FSM: {}", message,
-                  fsm);
+        LOG.error("PROTOCOL ERROR: Transition: {}, FSM: {}", message, fsm);
     }
 
     /*
@@ -346,6 +342,10 @@ public class SimpleProtocolImpl implements SimpleProtocol {
         String msg = new String(message);
         messageHandler.handle(msg);
         fsm.getTransitions().messageProcessed();
+    }
+
+    BufferProtocolHandler getBufferProtocolHandler() {
+        return handler;
     }
 
 }

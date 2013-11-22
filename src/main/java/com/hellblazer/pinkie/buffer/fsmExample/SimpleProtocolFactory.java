@@ -15,14 +15,11 @@
  */
 package com.hellblazer.pinkie.buffer.fsmExample;
 
-import java.nio.channels.SocketChannel;
-
-import com.hellblazer.pinkie.CommunicationsHandler;
-import com.hellblazer.pinkie.CommunicationsHandlerFactory;
-import com.hellblazer.pinkie.buffer.BufferProtocol;
+import com.hellblazer.pinkie.buffer.BufferProtocolFactory;
+import com.hellblazer.pinkie.buffer.BufferProtocolHandler;
 import com.hellblazer.pinkie.buffer.fsmExample.SimpleProtocolImpl.MessageHandler;
 
-public class SimpleProtocolFactory implements CommunicationsHandlerFactory {
+public class SimpleProtocolFactory extends BufferProtocolFactory {
 
     private final MessageHandler handler;
 
@@ -35,9 +32,8 @@ public class SimpleProtocolFactory implements CommunicationsHandlerFactory {
     }
 
     @Override
-    public CommunicationsHandler createCommunicationsHandler(SocketChannel channel) {
-        return new BufferProtocol(
-                                  new SimpleProtocolImpl(handler).getBufferProtocolHandler()).getHandler();
+    public BufferProtocolHandler constructBufferProtocolHandler() {
+        return new SimpleProtocolImpl(handler).getBufferProtocolHandler();
     }
 
 }
